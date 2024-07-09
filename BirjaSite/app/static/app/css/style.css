@@ -1,0 +1,129 @@
+body {
+    font-family: Inner, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.header-home-page {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #000;
+    color: #fff;
+}
+
+.header-home-page .logo {
+    font-size: 24px;
+}
+
+.header-home-page nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+}
+
+.header-home-page nav a:hover {
+    text-decoration: underline;
+}
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 70px;
+    background: url('../img/crypto_black_bcg.png') repeat;
+    background-size: 20%;
+    color: #fff;
+    font-family: Roboto, sans-serif;
+    font-weight: lighter;
+}
+
+.hero-image img {
+    width: 85%;
+}
+
+.hero-text {
+    max-width: 30%;
+}
+
+.hero-text h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.hero-text p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.hero-text button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #fff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+}
+
+.hero-text button:hover {
+    background: #ddd;
+}
+
+.advantages, .why-us {
+    display: flex;
+    padding: 50px;
+    background: url(../img/crypto_bcg.png) repeat;
+    background-size: 20%;
+}
+
+.advantages h2, .why-us h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.advantages ul {
+    list-style: none;
+    padding: 0;
+}
+
+.advantages ul li {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.advantage, .reasons {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.advantage {
+    flex-direction: column;
+}
+
+.advantage ul {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.advantage p {
+    font-size: 30px;
+    padding: 0;
+}
+
+.advantage strong {
+    padding: 0;
+}
+
+.reason {
+    width: 23%;
+}
+
+.reason h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.reason p {
+    font-size: 16px;
+}
