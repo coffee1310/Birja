@@ -1,0 +1,79 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="chart-container">
+    <div class="trade-controls">
+        <div class="time">
+            <span>00:00:00</span>
+            <span>Время</span>
+        </div>
+        <div class="amount">
+            <span>1$</span>
+            <span>Сумма</span>
+        </div>
+        <div class="buttons">
+            <button class="higher"><img src="{% static 'app/img/profit_up.png' %}"/><strong>ВЫШЕ</strong></button>
+            <button class="lower"><img src="{% static 'app/img/profit_down.png' %}"/><strong>НИЖЕ</strong></button>
+        </div>
+    </div>
+</div>
+
+<div class="graphic">
+    <canvas id="cryptoChart"></canvas>
+</div>
+ <script>
+        // Инициализация графика
+        const ctx = document.getElementById('cryptoChart').getContext('2d');
+        const cryptoChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Метки времени
+                datasets: [{
+                    label: 'Цена криптовалюты',
+                    data: [],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'second'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        // Функция для генерации случайных данных
+        function getRandomPrice() {
+            return (Math.random() * (50000 - 30000) + 30000).toFixed(2);
+        }
+
+        // Обновление данных графика
+        function updateChart() {
+            const currentTime = new Date();
+            const newPrice = getRandomPrice();
+
+            if (cryptoChart.data.labels.length > 20) {
+                cryptoChart.data.labels.shift();
+                cryptoChart.data.datasets[0].data.shift();
+            }
+
+            cryptoChart.data.labels.push(currentTime);
+            cryptoChart.data.datasets[0].data.push(newPrice);
+            cryptoChart.update();
+        }
+
+        // Обновление графика каждые 2 секунды
+        setInterval(updateChart, 2000);
+    </script>
+{% endblock %}

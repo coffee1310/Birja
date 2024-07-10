@@ -10,6 +10,13 @@ class indexPage(TemplateView):
         context = super().get_context_data(**kwargs)
         return context
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         return self.render_to_response(context)
+
+class tradePage(TemplateView):
+    template_name = "app/trade.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

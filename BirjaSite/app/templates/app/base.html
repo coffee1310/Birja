@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,11 +7,50 @@
 	<link type="text/css" href="{% static 'app/css/style.css' %}" rel="stylesheet" />
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
+<header class="header">
+    <div class="balance">
+        <span>0.00$</span>
+        <button>Пополнить счет<img src="{% static 'app/img/wallet.png' %}"></button>
+    </div>
+    <div class="profile-icon">
+        <img src="{% static 'app/img/profile_2.png' %}" alt="Профиль">
+    </div>
+</header>
 
 <body>
-{% block content %}
-{% endblock %}
+	<div class="content">
+		<div class="sidebar">
+			<div class="items">
+		        <div class="menu-item">
+		            <a href="#"><img src="{% static 'app/img/trade.png' %}" alt="Торговля"></a>
+		            <span><a href="#">Торговля</a></span>
+		        </div>
+		        <div class="menu-item">
+		            <a href="#"><img src="{% static 'app/img/profile_1.png' %}" alt="Профиль"></a>
+		            <span><a href="#">Профиль</a></span>
+		        </div>
+		        <div class="menu-item">
+		            <a href="#"><img src="{% static 'app/img/finance.png' %}" alt="Финансы"></a>
+		            <span><a href="#">Финансы</a></span>
+		        </div>
+		        <div class="menu-item">
+		            <a href="#"><img src="{% static 'app/img/history.png' %}" alt="История"></a>
+		            <span><a href="#">История</a></span>
+		        </div>
+		    </div>
+	        <div class="close-sidebar">
+	            <a href="#"><img src="{% static 'app/img/exit.png' %}" alt="Закрыть"></a>
+	        </div>
+	    </div>
+			{% block content %}
+			{% endblock %}
+	</div>
 </body>
+
 </html>

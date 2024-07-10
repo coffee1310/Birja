@@ -18,31 +18,31 @@
 </header>
 <body>
 	<section class="hero">
-        <div class="hero-text">
+        <div class="hero-text fade-in">
             <h1>ВАШ НАДЕЖНЫЙ ПАРТНЕР ДЛЯ ОНЛАЙН-ТОРГОВЛИ НА ФИНАНСОВЫХ РЫНКАХ</h1>
             <p>Торговля с удобством и простотой. Более 100 мировых активов в вашем распоряжении</p>
             <button>Торговать</button>
         </div>
-        <div class="hero-image">
+        <div class="hero-image fade-in">
             <img src="{% static 'app/img/monitor.png' %}" alt="Trading Screen">
         </div>
     </section>
-    <div class="information">
+    <div class="information fade-in">
 	    <section class="advantages">
 	        <div class="advantage">
 	            <h2>ОФОРМЛЯЙТЕ ТОРГОВЫЕ ОРДЕРА С МАКСИМАЛЬНО ВЫГОДНЫМИ УСЛОВИЯМИ</h2>
 	            <ul>
-	                <li><strong>150$</strong> МИНИМАЛЬНАЯ СУММА ИНВЕСТИЦИИ</li>
+	                <li><strong class="count-up" data-target="150">0$</strong> МИНИМАЛЬНАЯ СУММА ИНВЕСТИЦИИ</li>
 	                <li><strong>0,1$</strong> МИНИМАЛЬНАЯ СУММА СДЕЛКИ</li>
-	                <li><strong>10$</strong> МИНИМАЛЬНАЯ СУММА ВЫВОДА</li>
-	                <li><strong>50+</strong> КРИПТОВАЛЮТ НА ВЫБОР</li>
+	                <li><strong class="count-up" data-target="10">0$</strong> МИНИМАЛЬНАЯ СУММА ВЫВОДА</li>
+	                <li><strong class="count-up" data-target="50">0+</strong> КРИПТОВАЛЮТ НА ВЫБОР</li>
 	            </ul>
 	        </div>
 	        <div class="advantage-image">
 	        	<img src="{% static 'app/img/phone.png' %}" alt="Chart Screen">
 	    	</div>
 	    </section>
-	    <section class="why-us">
+	    <section class="why-us fade-in">
         <div class="advantage">
             <h2>ПОЧЕМУ ИМЕННО МЫ?</h2>
             <ul>
@@ -66,5 +66,6 @@
         </div>
 	    </section>
 	</div>
+	 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
 </body>	
-
+</html>
