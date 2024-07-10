@@ -3,7 +3,10 @@ body {
     margin: 0;
     padding: 0;
 }
-
+section {
+    width: 100%;
+    box-sizing: border-box;
+}
 .header-home-page {
     display: flex;
     justify-content: space-between;
@@ -31,16 +34,17 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0px 70px;
+    padding: 0 70px;
     background: url('../img/crypto_black_bcg.png') repeat;
     background-size: 20%;
     color: #fff;
     font-family: Roboto, sans-serif;
     font-weight: lighter;
+    height: 100vh;
 }
 
 .hero-image img {
-    width: 85%;
+    width: 75%;
 }
 
 .hero-text {
@@ -70,11 +74,15 @@ body {
     background: #ddd;
 }
 
-.advantages, .why-us {
-    display: flex;
-    padding: 50px;
+.information {
     background: url(../img/crypto_bcg.png) repeat;
     background-size: 20%;
+}
+
+.advantages {
+    display: flex;
+    padding: 50px;
+
 }
 
 .advantages h2, .why-us h2 {
@@ -85,45 +93,93 @@ body {
 .advantages ul {
     list-style: none;
     padding: 0;
+    margin: 0; /* Удаление отступов */
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .advantages ul li {
-    font-size: 18px;
-    margin-bottom: 10px;
+    font-size: 25px;
+    flex: 0 1 calc(50% - 10px); /* Два элемента в строке */
+    box-sizing: border-box; /* Учитывание паддингов и бордеров в размере блока */
+    margin: 5px; /* Разделение элементов */
+    margin-top: 25px;
+    padding: 0;
+    width: 10%;
 }
 
-.advantage, .reasons {
+.advantage {
     display: flex;
     flex-wrap: nowrap;
 }
 
 .advantage {
     flex-direction: column;
+    flex: 1;
 }
 
-.advantage ul {
+.advantage h2 {
+    font-size: 40px;
+    width: 80%;
+    margin-top: 100px;
+}
+
+.advantage strong {
+    display: block;
+    font-size: 60px;
+}
+
+.advantages img {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    justify-content: right;
+}
+
+.advantage-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+
+.why-us {
+    display: flex;
+    padding: 50px;
+
+}
+
+.why-us h2 {
+    margin: 0;
+    font-size: 45px;
+    margin-bottom: 20px;
+}
+
+.why-us h3 {
+    margin: 0;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.why-us ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-left: 50px;
     display: flex;
     flex-wrap: wrap;
 }
 
-.advantage p {
-    font-size: 30px;
+.why-us ul li {
+    font-size: 25px;
+    flex: 0 1 calc(50% - 10px); /* Два элемента в строке */
+    box-sizing: border-box; /* Учитывание паддингов и бордеров в размере блока */
+    margin: 5px; /* Разделение элементов */
+    margin-top: 25px;
     padding: 0;
 }
 
-.advantage strong {
-    padding: 0;
-}
-
-.reason {
-    width: 23%;
-}
-
-.reason h3 {
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-
-.reason p {
-    font-size: 16px;
+.why-us p {
+    width: 50%;
 }
