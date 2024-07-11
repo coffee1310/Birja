@@ -455,3 +455,13 @@ section {
     /*background: url(../img/bcg.jpeg) no-repeat;
     background-size: 100%;*/
 }
+
+.graphic {
+    width: 75%;
+    margin: auto auto;
+    height: 400px;
+}
+
+#cryptoChart {
+    width: 50%;
+}

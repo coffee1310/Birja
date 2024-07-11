@@ -3,7 +3,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const counters = document.querySelectorAll('.count-up');
 
     const options = {
-        threshold: 0.1
+        threshold: 0.1,
+        passive: true // Добавляем опцию passive для улучшения производительности
     };
 
     const appearOnScroll = new IntersectionObserver(function(entries, observer) {
@@ -49,4 +50,53 @@ document.addEventListener("DOMContentLoaded", function() {
 
         updateCount();
     }
+
+    const bitcoinChart = new Chart(document.getElementById('cryptoChart'), {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Bitcoin Price (USD)',
+                data: [],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        tooltipFormat: 'll'
+                    }
+                },
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+
+    function fetchAndAddDataToChart() {
+        fetch('/get_blockchain_data/')  // Путь к вашему Django view
+    .then(response => response.json())
+    .then(data => {
+        // Обработка полученных данных и добавление их в график
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Ошибка при получении данных:', error);
+    });
+}
+
+    // Инициализируем загрузку данных при загрузке страницы
+    fetchAndAddDataToChart();
+
+    // Обновляем данные каждые 2 минуты
+    setInterval(fetchAndAddDataToChart, 120000); // 120000 мс = 2 минуты
 });

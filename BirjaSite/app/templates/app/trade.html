@@ -22,58 +22,5 @@
 <div class="graphic">
     <canvas id="cryptoChart"></canvas>
 </div>
- <script>
-        // Инициализация графика
-        const ctx = document.getElementById('cryptoChart').getContext('2d');
-        const cryptoChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [], // Метки времени
-                datasets: [{
-                    label: 'Цена криптовалюты',
-                    data: [],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                    fill: false
-                }]
-            },
-            options: {
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'second'
-                        }
-                    },
-                    y: {
-                        beginAtZero: false
-                    }
-                }
-            }
-        });
-
-        // Функция для генерации случайных данных
-        function getRandomPrice() {
-            return (Math.random() * (50000 - 30000) + 30000).toFixed(2);
-        }
-
-        // Обновление данных графика
-        function updateChart() {
-            const currentTime = new Date();
-            const newPrice = getRandomPrice();
-
-            if (cryptoChart.data.labels.length > 20) {
-                cryptoChart.data.labels.shift();
-                cryptoChart.data.datasets[0].data.shift();
-            }
-
-            cryptoChart.data.labels.push(currentTime);
-            cryptoChart.data.datasets[0].data.push(newPrice);
-            cryptoChart.update();
-        }
-
-        // Обновление графика каждые 2 секунды
-        setInterval(updateChart, 2000);
-    </script>
+<script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
 {% endblock %}
