@@ -2,6 +2,13 @@
 {% load static %}
 
 {% block content %}
+<select id="cryptoSelect" class="cryptoSelect">
+        <option value="BTC">BTC</option>
+        <option value="ETH">ETH</option>
+        <option value="LTC">LTC</option>
+        <!-- Добавьте другие криптовалюты по мере необходимости -->
+    </select>
+
 <div class="chart-container">
     <div class="trade-controls">
         <div class="time">
@@ -22,5 +29,17 @@
 <div class="graphic">
     <canvas id="cryptoChart"></canvas>
 </div>
+
+<div id="timeRangeButtons" class="timeRangeButtons">
+        <button data-range="all">Все время</button>
+        <button data-range="5y">5 лет</button>
+        <button data-range="1y">1 год</button>
+        <button data-range="6m">6 месяцев</button>
+        <button data-range="1m">1 месяц</button>
+        <button data-range="1w">1 неделя</button>
+        <button data-range="1d">1 день</button>
+        <button data-range="1h">1 час</button>
+    </div>
+
 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
 {% endblock %}

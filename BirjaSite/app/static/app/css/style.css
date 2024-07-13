@@ -387,6 +387,7 @@ section {
     position: absolute;
     right: 0;
     height: 100vh;
+    width: 200px;
     background: #000000;
     z-index: -1;
 }
@@ -452,16 +453,28 @@ section {
     font-size: 20px;
 }
 .content {
-    /*background: url(../img/bcg.jpeg) no-repeat;
-    background-size: 100%;*/
+    
 }
 
 .graphic {
-    width: 75%;
-    margin: auto auto;
-    height: 400px;
+    margin-left: 70px; 
+    margin-bottom: 50px; 
+    width: calc(100% - 200px - 70px);
+    height: calc(100vh - 100px);
 }
 
-#cryptoChart {
-    width: 50%;
+
+.body {
+    background: url(../img/bcg.jpeg) no-repeat;
+    background-size: 100%;
+}
+
+.cryptoSelect {
+    margin-top: 100px;
+    margin-left: 100px;
+    position: absolute; 
+}
+
+.timeRangeButtons {
+    margin-left: 100px;
 }
