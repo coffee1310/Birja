@@ -1,9 +1,13 @@
 import requests
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.views.generic import TemplateView, FormView, ListView, DetailView
+from django.urls import reverse_lazy
+from django.contrib.auth import login
+from django.views.generic import TemplateView, FormView, ListView, DetailView, CreateView
+from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 
+from app.models import *
+from app.forms import *
 # Create your views here.
 class indexPage(TemplateView):
     template_name = "app/index.html"
@@ -23,6 +27,27 @@ class tradePage(TemplateView):
         context = super().get_context_data(**kwargs)
         return context
 
+class RegistrationPage(CreateView):
+    template_name = "app/registration.html"
+
+    model = CustomUser
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('index')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login(self.request, self.object)
+        return response
+
+class CustomLoginPage(LoginView):
+    form_class = CustomLoginForm
+    template_name = 'app/login.html'
+    success_url = reverse_lazy('index')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login(self.request, self.object)
+        return response
 
 def get_bitcoin_data(request):
     url = 'https://api.blockchain.com/charts/market-price'
