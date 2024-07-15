@@ -11,13 +11,34 @@
 
 <div class="chart-container">
     <div class="trade-controls">
-        <div class="time">
-            <span>00:00:00</span>
-            <span>Время</span>
+        <div class="timer-menu">
+            <button id="timer-toggle">Выбрать время</button>
+            <div id="timer-settings" class="timer-settings hidden">
+                <div class="timer-settings-2">
+                    <div class="timer-control">
+                        <button id="hours-inc">+</button>
+                        <span id="hours">00</span>
+                        <button id="hours-dec">-</button>
+                    </div>
+                    <div class="timer-control">
+                        <button id="minutes-inc">+</button>
+                        <span id="minutes">00</span>
+                        <button id="minutes-dec">-</button>
+                    </div>
+                    <div class="timer-control">
+                        <button id="seconds-inc">+</button>
+                        <span id="seconds">00</span>
+                        <button id="seconds-dec">-</button>
+                    </div>
+                </div>
+            </div>
+            <span id="timer-display">00:00:00</span>
         </div>
         <div class="amount">
-            <span>1$</span>
-            <span>Сумма</span>
+            <form method="POST">
+                <input type="value" name="" value="1$">
+                <span>Сумма</span>
+            </form>
         </div>
         <div class="buttons">
             <button class="higher"><img src="{% static 'app/img/profit_up.png' %}"/><strong>ВЫШЕ</strong></button>
@@ -42,4 +63,5 @@
     </div>
 
 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/js/timer.js' %}"></script>
 {% endblock %}

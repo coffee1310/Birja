@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const options = {
         threshold: 0.1,
-        passive: true // Добавляем опцию passive для улучшения производительности
+        passive: true
     };
 
     const appearOnScroll = new IntersectionObserver(function(entries, observer) {
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function animateCount(element) {
         const target = +element.getAttribute('data-target');
-        const increment = target / 100; // продолжительность анимации
+        const increment = target / 100; 
 
         let current = 0;
         function updateCount() {
@@ -76,7 +76,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 },
                 y: {
-                    beginAtZero: false
+                    beginAtZero: false,
+                    min: 0
                 }
             },
             plugins: {
@@ -95,7 +96,14 @@ document.addEventListener("DOMContentLoaded", function() {
                         pinch: {
                             enabled: false
                         },
-                        mode: 'xy'
+                        mode: 'xy',
+                        onZoom: function({chart}) {
+                            const minYBoundary = Math.min(...chart.data.datasets[0].data);
+                            if (chart.options.scales.y.min < minYBoundary) {
+                                chart.options.scales.y.min = minYBoundary;
+                                chart.update();
+                            }
+                        }
                     }
                 }
             }
@@ -114,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         switch (range) {
             case 'all':
-                fromTimestamp = now - (10 * 365 * dayInSeconds); // Примерно 10 лет
+                fromTimestamp = now - (10 * 365 * dayInSeconds);
                 timeUnit = 'month';
                 url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=2000&api_key=${apiKey}`;
                 break;
@@ -154,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 url = `https://min-api.cryptocompare.com/data/v2/histominute?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=60&api_key=${apiKey}`;
                 break;
             default:
-                fromTimestamp = now - (10 * 365 * dayInSeconds); // По умолчанию 10 лет
+                fromTimestamp = now - (10 * 365 * dayInSeconds);
                 timeUnit = 'month';
                 url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=2000&api_key=${apiKey}`;
         }
@@ -163,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const response = await fetch(url);
             const data = await response.json();
 
-            console.log(data); // Логирование данных для отладки
+            console.log(data);
 
             if (data.Response === "Success") {
                 const prices = data.Data.Data.map(point => ({
@@ -173,7 +181,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 bitcoinChart.data.labels = prices.map(point => point.t);
                 bitcoinChart.data.datasets[0].data = prices.map(point => point.y);
-                bitcoinChart.options.scales.x.time.unit = timeUnit; // Устанавливаем единицу времени для оси x
+
+                const minY = Math.min(...prices.map(point => point.y));
+                bitcoinChart.options.scales.y.min = minY;
+
+                bitcoinChart.options.scales.x.time.unit = timeUnit;
                 bitcoinChart.update();
                 document.getElementById('cryptoChart').focus();
             } else {
@@ -184,7 +196,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Инициализация графика с данными для выбранной криптовалюты и интервала
     const cryptoSelect = document.getElementById('cryptoSelect');
     const timeRangeButtons = document.querySelectorAll('#timeRangeButtons button');
     let currentRange = 'all';
@@ -200,11 +211,10 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Изначально загружаем данные для первой криптовалюты в списке и выбранного интервала
     fetchAndAddDataToChart(cryptoSelect.value, currentRange);
 
-    // Обновление данных каждые 2 минуты
-    setInterval(() => fetchAndAddDataToChart(cryptoSelect.value, currentRange), 10000); // 120000 мс = 2 минуты
+    setInterval(() => fetchAndAddDataToChart(cryptoSelect.value, currentRange), 10000);
+
     let isDragging = false;
     let startX = 0;
     let startY = 0;
@@ -231,22 +241,20 @@ document.addEventListener("DOMContentLoaded", function() {
         if (isDragging) {
             const deltaX = event.clientX - startX;
             const deltaY = event.clientY - startY;
-            const scaleX = 1 + deltaX / 1000; // Настройте это значение для изменения чувствительности горизонтальной прокрутки
-            const scaleY = 1 + deltaY / 1000; // Настройте это значение для изменения чувствительности вертикальной прокрутки
 
-            // Обновляем горизонтальные границы
-            const newMinX = initialMinX + (deltaX * (initialMaxX - initialMinX) / 1000);
-            const newMaxX = initialMaxX + (deltaX * (initialMaxX - initialMinX) / 1000);
+            const minXBoundary = bitcoinChart.data.labels[0].getTime();
+            const maxXBoundary = bitcoinChart.data.labels[bitcoinChart.data.labels.length - 1].getTime();
+            const minYBoundary = Math.min(...bitcoinChart.data.datasets[0].data);
 
-            // Ограничиваем минимальные и максимальные значения
+            const newMinX = Math.max(minXBoundary, initialMinX + deltaX * (initialMaxX - initialMinX) / 1000);
+            const newMaxX = Math.min(maxXBoundary, initialMaxX + deltaX * (initialMaxX - initialMinX) / 1000);
+
             bitcoinChart.options.scales.x.min = newMinX;
             bitcoinChart.options.scales.x.max = newMaxX;
 
-            // Обновляем вертикальные границы
-            const newMinY = initialMinY / scaleY;
-            const newMaxY = initialMaxY / scaleY;
+            const newMinY = Math.max(minYBoundary, initialMinY - deltaY * (initialMaxY - initialMinY) / 1000);
+            const newMaxY = initialMaxY - deltaY * (initialMaxY - initialMinY) / 1000;
 
-            // Ограничиваем минимальные и максимальные значения
             bitcoinChart.options.scales.y.min = newMinY;
             bitcoinChart.options.scales.y.max = newMaxY;
 

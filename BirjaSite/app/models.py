@@ -44,3 +44,29 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+class CryptoCurrency(models.Model):
+    name = models.CharField(max_length=50)
+    symbol = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+class Position(models.Model):
+    POSITION_TYPES = (
+        ('long', 'Long'),
+        ('short', 'Short'),
+    )
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    crypto = models.ForeignKey(CryptoCurrency, on_delete=models.CASCADE)
+    position_type = models.CharField(max_length=5, choices=POSITION_TYPES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    open_price = models.DecimalField(max_digits=10, decimal_places=2)
+    open_time = models.DateTimeField(auto_now_add=True)
+    duration = models.IntegerField()  # Duration in seconds
+    closed = models.BooleanField(default=False)
+    profit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.crypto.symbol} - {self.position_type}"

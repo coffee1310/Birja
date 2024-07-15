@@ -18,6 +18,10 @@ section {
     color: #fff;
 }
 
+.header {
+    z-index: 2;
+}
+
 .header-home-page .logo {
     font-size: 2vw; /* Размер шрифта в зависимости от ширины экрана */
 }
@@ -107,10 +111,10 @@ section {
 }
 
 .advantages ul li, .why-us ul li {
-    font-size: 1.5vw; /* Размер шрифта в зависимости от ширины экрана */
-    flex: 0 1 calc(50% - 10px); /* Два элемента в строке */
-    box-sizing: border-box; /* Учитывание паддингов и бордеров в размере блока */
-    margin: 5px; /* Разделение элементов */
+    font-size: 1.5vw;
+    flex: 0 1 calc(50% - 10px);
+    box-sizing: border-box;
+    margin: 5px; 
     margin-top: 25px;
     padding: 0;
 }
@@ -126,14 +130,14 @@ section {
 }
 
 .advantage h2 {
-    font-size: 3vw; /* Размер шрифта в зависимости от ширины экрана */
+    font-size: 3vw;
     width: 80%;
     margin-top: 100px;
 }
 
 .advantage strong {
     display: block;
-    font-size: 3vw; /* Размер шрифта в зависимости от ширины экрана */
+    font-size: 3vw; 
 }
 
 .advantages img {
@@ -150,18 +154,18 @@ section {
 }
 
 .why-us h2 {
-    font-size: 3vw; /* Размер шрифта в зависимости от ширины экрана */
+    font-size: 3vw;
     margin-bottom: 20px;
 }
 
 .why-us h3 {
-    font-size: 2vw; /* Размер шрифта в зависимости от ширины экрана */
+    font-size: 2vw;
     margin-bottom: 20px;
 }
 
 .why-us p {
     width: 50%;
-    font-size: 1.5vw; /* Размер шрифта в зависимости от ширины экрана */
+    font-size: 1.5vw;
 }
 
 .fade-in {
@@ -174,8 +178,6 @@ section {
     opacity: 1;
     transform: translateY(0);
 }
-
-/* Медиазапросы для адаптивности */
 
 @media (max-width: 1200px) {
     .header-home-page .logo {
@@ -394,7 +396,7 @@ section {
     height: 100vh;
     width: 200px;
     background: #000000;
-    z-index: -1;
+    z-index: 1;
 }
 
 .chart {
@@ -435,6 +437,7 @@ section {
 .trade-controls .buttons button {
     background: none;
     border-radius: 5px;
+    border: 0;
     color: #00ff80;
     padding: 10px 20px;
     margin: 10px 0;
@@ -457,9 +460,6 @@ section {
     color: #651D1D;
     font-size: 20px;
 }
-.content {
-    
-}
 
 .graphic {
     margin-left: 70px; 
@@ -476,12 +476,117 @@ section {
 
 .cryptoSelect {
     margin-top: 100px;
-    margin-left: 100px;
-    position: absolute; 
+    margin-left: 150px;
+    position: absolute;
+    background-color: #249D92;
+    color: #FFFFFF;
+    width: 150px;
+    height: 30px;
+    border: 0;
+    border-radius: 5px;
+    opacity: 0.7;
+}
+
+#timer-toggle {
+    background-color: #000000;
+    color: white;
+    border: 0;
+    font-size: 20px;
 }
 
 .timeRangeButtons {
     margin-left: 100px;
+}
+
+.timeRangeButtons button {
+    color: white;
+    background-color: black;
+    border: 0;
+    border-radius: 5px;
+    font-size: 20px;
+}
+
+.timer-settings-2 {
+    display: inline-flex;
+    flex-direction: row;
+}
+
+
+.hidden {
+    display: none;
+}
+
+.timer-menu {
+    margin-top: 50px;
+    text-align: center;
+}
+
+.timer-control {
+    display: block;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+.timer-control button {
+    width: 30px;
+    text-align: center;
+    margin: 0 5px;
+    display: flex;
+    justify-content: center;
+    background-color: #000000;
+    color: white;
+    font-size: 25px;
+    border: 0;    
+}
+
+.timer-control button:hover {
+    margin: 0 5px;
+    display: flex;
+    background-color: #262626;
+    color: white;
+    font-size: 25px;
+    border: 0;    
+}
+
+#timer-confirm {
+    background-color: #000000;
+    font-size: 20px;
+    border: 0;
+    color: white;
+    margin-bottom: 10px;
+}
+
+#timer-confirm:hover {
+    background-color: #262626;
+}
+
+.timer-control span {
+    font-size: 25px;
+}
+
+.amount {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.amount input {
+    width: 50px;
+    border: 0;
+    background-color: #000000;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
+
+.amount form {
+    display: flex;
+    flex-direction: column;
+}
+
+.amount input:focus {
+    border: 0;
 }
 
 /* Registration  */

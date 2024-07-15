@@ -21,7 +21,11 @@
         <div class="hero-text fade-in">
             <h1>ВАШ НАДЕЖНЫЙ ПАРТНЕР ДЛЯ ОНЛАЙН-ТОРГОВЛИ НА ФИНАНСОВЫХ РЫНКАХ</h1>
             <p>Торговля с удобством и простотой. Более 100 мировых активов в вашем распоряжении</p>
-            <button><a href="{% url 'trade' %}">Торговать</a></button>
+            {% if user.is_authenticated %}
+                <button><a href="{% url 'trade' %}">Торговать</a></button>
+            {% else %}
+                <button><a href="{% url 'login' %}">Торговать</a></button>
+            {% endif %}
         </div>
         <div class="hero-image fade-in">
             <img src="{% static 'app/img/monitor.png' %}" alt="Trading Screen">
