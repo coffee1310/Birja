@@ -3,11 +3,10 @@
 
 {% block content %}
 <select id="cryptoSelect" class="cryptoSelect">
-        <option value="BTC">BTC</option>
-        <option value="ETH">ETH</option>
-        <option value="LTC">LTC</option>
-        <!-- Добавьте другие криптовалюты по мере необходимости -->
-    </select>
+    {% for crypto in cryptos %}
+        <option value="{{ crypto.symbol }}">{{ crypto.name }}</option>
+    {% endfor %}
+</select>
 
 <div class="chart-container">
     <div class="trade-controls">
@@ -35,14 +34,12 @@
             <span id="timer-display">00:00:00</span>
         </div>
         <div class="amount">
-            <form method="POST">
-                <input type="value" name="" value="1$">
-                <span>Сумма</span>
-            </form>
+            <input type="number" id="amount" value="1" min="0.01" step="0.01">
+            <span>Сумма</span>
         </div>
         <div class="buttons">
-            <button class="higher"><img src="{% static 'app/img/profit_up.png' %}"/><strong>ВЫШЕ</strong></button>
-            <button class="lower"><img src="{% static 'app/img/profit_down.png' %}"/><strong>НИЖЕ</strong></button>
+            <button class="higher" onclick="openPosition('long')"><img src="{% static 'app/img/profit_up.png' %}"/><strong>ВЫШЕ</strong></button>
+            <button class="lower" onclick="openPosition('short')"><img src="{% static 'app/img/profit_down.png' %}"/><strong>НИЖЕ</strong></button>
         </div>
     </div>
 </div>
@@ -52,16 +49,69 @@
 </div>
 
 <div id="timeRangeButtons" class="timeRangeButtons">
-        <button data-range="all">Все время</button>
-        <button data-range="5y">5 лет</button>
-        <button data-range="1y">1 год</button>
-        <button data-range="6m">6 месяцев</button>
-        <button data-range="1m">1 месяц</button>
-        <button data-range="1w">1 неделя</button>
-        <button data-range="1d">1 день</button>
-        <button data-range="1h">1 час</button>
-    </div>
+    <button data-range="all">Все время</button>
+    <button data-range="5y">5 лет</button>
+    <button data-range="1y">1 год</button>
+    <button data-range="6m">6 месяцев</button>
+    <button data-range="1m">1 месяц</button>
+    <button data-range="1w">1 неделя</button>
+    <button data-range="1d">1 день</button>
+    <button data-range="1h">1 час</button>
+</div>
 
 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/js/timer.js' %}"></script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+    const cryptoSelect = document.getElementById('cryptoSelect');
+    const amountInput = document.getElementById('amount');
+    const timerDisplay = document.getElementById('timer-display');
+
+    window.openPosition = function(positionType) {
+        const symbol = cryptoSelect.value;
+        const amount = amountInput.value;
+        const duration = parseInt(timerDisplay.textContent.split(':').reduce((acc, time) => (60 * acc) + +time));
+
+        const csrftoken = getCookie('csrftoken');
+
+        fetch('/trade/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                crypto: symbol,
+                amount: amount,
+                duration: duration,
+                position_type: positionType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Position opened successfully!');
+            } else {
+                alert('Error opening position: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error opening position:', error));
+    };
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
 {% endblock %}
