@@ -1,0 +1,56 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="profile">
+    <h1>Профиль</h1>
+    <form method="post" class="profile-form">
+        {% csrf_token %}
+        <div>
+            <label for="id_full_name">ФИО:</label>
+            {{ form.full_name }}
+            <button type="button" onclick="editField('id_full_name')">Редактировать</button>
+        </div>
+        <div>
+            <label for="id_email">Эл. почта:</label>
+            {{ form.email }}
+            <button type="button" onclick="editField('id_email')">Редактировать</button>
+        </div>
+        <div>
+            <label for="id_date_of_birth">Дата рождения:</label>
+            {{ form.date_of_birth }}
+            <button type="button" onclick="editField('id_date_of_birth')">Редактировать</button>
+        </div>
+        <div>
+            <label>Дата последней сделки:</label>
+            <span>{{ last_trade_date }}</span>
+        </div>
+        <div>
+            <label>Любимая криптовалюта:</label>
+            <span>{{ favorite_crypto }}</span>
+        </div>
+        <div>
+            <label>Самый прибыльный день:</label>
+            <span>{{ most_profitable_day }}</span>
+        </div>
+        <div>
+            <label>Выведено средств:</label>
+            <span>{{ total_withdrawn }}</span>
+        </div>
+        <button type="submit">Сохранить</button>
+    </form>
+</div>
+
+<script>
+    function editField(fieldId) {
+        const field = document.getElementById(fieldId);
+        field.removeAttribute('readonly');
+        field.focus();
+    }
+</script>
+
+{% endblock %}
+
+<style>
+    
+</style>

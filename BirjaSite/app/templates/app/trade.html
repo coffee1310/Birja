@@ -38,8 +38,8 @@
             <span>Сумма</span>
         </div>
         <div class="buttons">
-            <button class="higher" onclick="openPosition('long')"><img src="{% static 'app/img/profit_up.png' %}"/><strong>ВЫШЕ</strong></button>
-            <button class="lower" onclick="openPosition('short')"><img src="{% static 'app/img/profit_down.png' %}"/><strong>НИЖЕ</strong></button>
+            <button class="higher" onclick="preparePosition('long')"><img src="{% static 'app/img/profit_up.png' %}"/><strong>ВЫШЕ</strong></button>
+            <button class="lower" onclick="preparePosition('short')"><img src="{% static 'app/img/profit_down.png' %}"/><strong>НИЖЕ</strong></button>
         </div>
     </div>
 </div>
@@ -67,9 +67,63 @@ document.addEventListener("DOMContentLoaded", function() {
     const amountInput = document.getElementById('amount');
     const timerDisplay = document.getElementById('timer-display');
 
-    window.openPosition = function(positionType) {
+    window.preparePosition = function(positionType) {
+        const amount = parseFloat(amountInput.value);
+        checkUserBalance(amount)
+            .then(balanceOk => {
+                if (balanceOk) {
+                    startTimer();
+                    openPosition(positionType, amount);
+                } else {
+                    alert('Недостаточно средств на счете.');
+                }
+            })
+            .catch(error => console.error('Error checking balance:', error));
+    };
+
+    function checkUserBalance(amount) {
+        const csrftoken = getCookie('csrftoken');
+        return fetch('/check_balance/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ amount: amount })
+        })
+        .then(response => response.json())
+        .then(data => data.balance_ok)
+        .catch(error => {
+            console.error('Error checking balance:', error);
+            return false;
+        });
+    }
+
+    function startTimer() {
+        const hours = parseInt(document.getElementById('hours').textContent, 10);
+        const minutes = parseInt(document.getElementById('minutes').textContent, 10);
+        const seconds = parseInt(document.getElementById('seconds').textContent, 10);
+        const totalTime = (hours * 3600) + (minutes * 60) + seconds;
+
+        let timeLeft = totalTime;
+        const timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                alert('Время истекло!');
+                return;
+            }
+
+            timeLeft--;
+            const hrs = Math.floor(timeLeft / 3600);
+            const mins = Math.floor((timeLeft % 3600) / 60);
+            const secs = timeLeft % 60;
+
+            timerDisplay.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    window.openPosition = function(positionType, amount) {
         const symbol = cryptoSelect.value;
-        const amount = amountInput.value;
         const duration = parseInt(timerDisplay.textContent.split(':').reduce((acc, time) => (60 * acc) + +time));
 
         const csrftoken = getCookie('csrftoken');
@@ -90,9 +144,9 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                alert('Position opened successfully!');
+                console.log('Position opened successfully!');
             } else {
-                alert('Error opening position: ' + data.message);
+                console.log('Error opening position: ' + data.message);
             }
         })
         .catch(error => console.error('Error opening position:', error));

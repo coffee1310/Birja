@@ -45,6 +45,27 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+    @property
+    def last_trade_date(self):
+        last_trade = self.position_set.order_by('-open_time').first()
+        return last_trade.open_time if last_trade else None
+
+    @property
+    def favorite_crypto(self):
+        favorite = self.position_set.values('crypto__name').annotate(total=models.Count('crypto')).order_by(
+            '-total').first()
+        return favorite['crypto__name'] if favorite else None
+
+    @property
+    def most_profitable_day(self):
+        trades = self.position_set.values('open_time__date').annotate(profit_sum=models.Sum('profit')).order_by(
+            '-profit_sum').first()
+        return trades['open_time__date'] if trades else None
+
+    @property
+    def total_withdrawn(self):
+        return self.withdrawal_set.aggregate(total=models.Sum('amount'))['total'] or 0.00
+
 class CryptoCurrency(models.Model):
     name = models.CharField(max_length=50)
     symbol = models.CharField(max_length=10)
@@ -64,9 +85,17 @@ class Position(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     open_price = models.DecimalField(max_digits=10, decimal_places=2)
     open_time = models.DateTimeField(auto_now_add=True)
-    duration = models.IntegerField()  # Продолжительность в секундах
+    duration = models.IntegerField()
     closed = models.BooleanField(default=False)
     profit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.email} - {self.crypto.symbol} - {self.position_type}"
+
+class Withdrawal(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='withdrawals')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.amount}"

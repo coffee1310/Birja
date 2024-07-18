@@ -471,7 +471,6 @@ section {
 
 .body {
     background: url(../img/bcg.jpeg) no-repeat;
-    background-size: 100%;
 }
 
 .cryptoSelect {
@@ -695,4 +694,136 @@ input[type="date"]::placeholder {
 
 .Registration a, .Login a {
     color: #00bfa5;
+}
+
+/* History  */
+
+.filter-form {
+    display: flex;
+    justify-content: left;
+    align-items: end;
+    margin-bottom: 20px;
+}
+
+.filter-form p {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    margin: 0 10px;
+}
+
+.history {
+    padding: 20px;
+    margin: 0 auto;
+    border-radius: 8px;
+    max-width: 1200px;
+}
+
+.history h1 {
+    text-align: center;
+    color: white;
+    margin-top: 100px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; /* предотвращает перенос текста */
+}
+
+th {
+    color: white;
+}
+
+tbody {
+    color: white;
+}
+
+
+.filter-form select,
+.filter-form button {
+    padding: 5px;
+    margin-right: 10px;
+    background-color: #444;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 4px;
+    height: 40px;
+}
+
+.filter-form button {
+    cursor: pointer;
+    width: 150px;
+    height: 40px;
+    border: 1px solid #249D92;
+    background-color: #249D92;
+    vertical-align: middle;
+}
+
+/* Profile  */
+
+.profile {
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 800px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.profile h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-form div {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.profile-form label {
+    width: 200px;
+    font-weight: bold;
+}
+
+.profile-form input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.profile-form button[type="button"] {
+    margin-left: 10px;
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.profile-form button[type="button"]:hover {
+    background-color: #0056b3;
+}
+
+.profile-form button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.profile-form button[type="submit"]:hover {
+    background-color: #218838;
 }

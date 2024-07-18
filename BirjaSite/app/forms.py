@@ -44,3 +44,29 @@ class PositionForm(forms.ModelForm):
             'position_type': forms.RadioSelect(),
             'duration': forms.NumberInput(attrs={'min': 1, 'step': 1}),
         }
+
+class PositionFilterForm(forms.Form):
+    PERIOD_CHOICES = [
+        ('all_time', 'За все время'),
+        ('year', 'За год'),
+        ('month', 'За месяц'),
+    ]
+    OUTCOME_CHOICES = [
+        ('any', 'Любой исход'),
+        ('positive', 'Положительный'),
+        ('negative', 'Отрицательный'),
+    ]
+    POSITION_TYPE_CHOICES = [
+        ('all', 'Все типы операций'),
+        ('long', 'Длинная'),
+        ('short', 'Короткая'),
+    ]
+
+    period = forms.ChoiceField(choices=PERIOD_CHOICES, label="Период", required=False)
+    outcome = forms.ChoiceField(choices=OUTCOME_CHOICES, label="Исход", required=False)
+    position_type = forms.ChoiceField(choices=POSITION_TYPE_CHOICES, label="Тип операции", required=False)
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['full_name', 'email', 'date_of_birth']

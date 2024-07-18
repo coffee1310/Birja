@@ -1,6 +1,7 @@
 import requests
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import login
 from django.views.generic import TemplateView, FormView, ListView, DetailView, CreateView
 from django.contrib.auth.views import LoginView
@@ -8,6 +9,7 @@ from django.http import JsonResponse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 from decimal import Decimal
 import threading
 import time
@@ -119,12 +121,71 @@ class LoginPage(LoginView):
     def form_valid(self, form):
         user = form.get_user()
         login(self.request, user)
-        print(1)
         return super().form_valid(form)
 
     def get_success_url(self):
-        print(2)
         return reverse_lazy("index")
+
+class PositionListView(ListView):
+    model = Position
+    template_name = 'app/history.html'
+    context_object_name = 'positions'
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(user=self.request.user)
+        form = PositionFilterForm(self.request.GET)
+
+        if form.is_valid():
+            period = form.cleaned_data.get('period')
+            outcome = form.cleaned_data.get('outcome')
+            position_type = form.cleaned_data.get('position_type')
+
+            if period == 'year':
+                queryset = queryset.filter(open_time__gte=timezone.now() - timezone.timedelta(days=365))
+            elif period == 'month':
+                queryset = queryset.filter(open_time__gte=timezone.now() - timezone.timedelta(days=30))
+
+            if outcome == 'positive':
+                queryset = queryset.filter(profit__gt=0)
+            elif outcome == 'negative':
+                queryset = queryset.filter(profit__lt=0)
+
+            if position_type == 'long':
+                queryset = queryset.filter(position_type='long')
+            elif position_type == 'short':
+                queryset = queryset.filter(position_type='short')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = PositionFilterForm(self.request.GET)
+        return context
+
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = CustomUser
+    template_name = 'app/profile.html'
+    context_object_name = 'user'
+
+    def get_object(self):
+        return self.request.user
+
+    def post(self, request, *args, **kwargs):
+        user = self.get_object()
+        form = ProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = ProfileForm(instance=self.object)
+        context['last_trade_date'] = self.object.last_trade_date
+        context['favorite_crypto'] = self.object.favorite_crypto
+        context['most_profitable_day'] = self.object.most_profitable_day
+        context['total_withdrawn'] = self.object.total_withdrawn
+        return context
 
 def get_bitcoin_data(request):
     url = 'https://api.blockchain.com/charts/market-price'
@@ -199,3 +260,26 @@ def get_crypto_price(request, symbol):
         return JsonResponse({'price': data['USD']})
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+@csrf_exempt
+def check_balance(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        amount = float(data.get('amount', 0))
+        duration = int(data.get('duration', 0))
+        print(amount)
+        print(duration)
+        if amount < 1:
+            return JsonResponse({'balance_ok': False})
+
+        user_account = request.user
+        balance_ok = user_account.balance >= amount
+
+        return JsonResponse({'balance_ok': balance_ok})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
