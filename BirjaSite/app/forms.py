@@ -67,6 +67,15 @@ class PositionFilterForm(forms.Form):
     position_type = forms.ChoiceField(choices=POSITION_TYPE_CHOICES, label="Тип операции", required=False)
 
 class ProfileForm(forms.ModelForm):
+    date_of_birth = forms.DateField(
+        widget=forms.DateInput(format='%Y-%m-%d'),
+        input_formats=['%Y-%m-%d']
+    )
+
     class Meta:
         model = CustomUser
         fields = ['full_name', 'email', 'date_of_birth']
+
+class DepositForm(forms.Form):
+    wallet_address = forms.CharField(label='Адрес кошелька', max_length=100)
+    amount = forms.DecimalField(label='Сумма пополнения', max_digits=10, decimal_places=2)

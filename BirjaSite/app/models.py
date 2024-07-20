@@ -1,3 +1,4 @@
+# models.py
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.db import models
 from django.utils import timezone
@@ -64,11 +65,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     @property
     def total_withdrawn(self):
-        return self.withdrawal_set.aggregate(total=models.Sum('amount'))['total'] or 0.00
+        return self.withdrawals.aggregate(total=models.Sum('amount'))['total'] or 0.00
 
 class CryptoCurrency(models.Model):
     name = models.CharField(max_length=50)
     symbol = models.CharField(max_length=10)
+    img = models.ImageField(upload_to="Img/", verbose_name="Изображение продукта")
 
     def __str__(self):
         return self.name

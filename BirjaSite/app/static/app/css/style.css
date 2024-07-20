@@ -297,7 +297,7 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: absolute;
+    position: fixed;
 }
 
 .items {
@@ -371,6 +371,11 @@ section {
     color: white;
     margin-right: 20px;
     font-size: 15px;
+}
+
+.balance button a {
+    text-decoration: none;
+    color: white;
 }
 
 .balance img {
@@ -499,11 +504,39 @@ section {
 
 .timeRangeButtons button {
     color: white;
-    background-color: black;
+    background-color: #262626;
     border: 0;
     border-radius: 5px;
     font-size: 20px;
+    width: 130px;
+    height: 50px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
+
+.timeRangeButtons button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #249D92, #249D92);
+    transition: left 0.3s ease;
+    color: #000;
+}
+
+.timeRangeButtons button:hover::before {
+    left: 0;
+}
+
+.timeRangeButtons button span {
+    position: relative;
+    z-index: 5;
+}   
 
 .timer-settings-2 {
     display: inline-flex;
@@ -696,6 +729,10 @@ input[type="date"]::placeholder {
     color: #00bfa5;
 }
 
+.error {
+    color: white;
+}
+
 /* History  */
 
 .filter-form {
@@ -773,57 +810,269 @@ tbody {
     padding: 20px;
     margin: 0 auto;
     max-width: 800px;
-    background-color: #f9f9f9;
     border-radius: 8px;
 }
 
 .profile h1 {
     text-align: center;
     margin-bottom: 20px;
+    margin-top: 100px;
+    color: white;
 }
 
-.profile-form div {
-    margin-bottom: 15px;
+.profile-form .form-group {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
 }
 
 .profile-form label {
     width: 200px;
     font-weight: bold;
+    color: white;
+    margin-right: 20px;
 }
 
+.profile-form span,
 .profile-form input {
     flex: 1;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 0;
     border-radius: 4px;
+    background-color: transparent;
+    font-size: 20px;
+    color: white;
+}
+
+.profile-form hr {
+    height: 1px;
+    background-color: white;
+    border: none;
 }
 
 .profile-form button[type="button"] {
-    margin-left: 10px;
-    padding: 8px 12px;
-    background-color: #007bff;
+    background-color: transparent;
     color: #fff;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
 }
 
+.profile-form button[type="button"] img {
+    width: 20px;
+}
+
 .profile-form button[type="button"]:hover {
-    background-color: #0056b3;
+    color: #249D92;
 }
 
 .profile-form button[type="submit"] {
     width: 100%;
     padding: 10px;
-    background-color: #28a745;
+    background-color: #249D92;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    margin-top: 20px;
 }
 
 .profile-form button[type="submit"]:hover {
-    background-color: #218838;
+    background-color: #1f8376;
+}
+
+/* deposit */
+
+.deposit-withdraw {
+    display: flex;
+    margin-left: 10%;
+}
+
+.deposit, .withdraw {
+    margin-top: 100px;
+    margin-left: 20px;
+    width: 150px;
+    height: 40px;
+    border: 0;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.deposit a {
+    color: white;
+    text-decoration: none;
+    z-index: 1;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.withdraw a {
+    color: #000;
+    text-decoration: none;
+    z-index: 1;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.deposit::before, .withdraw::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(36, 157, 146, 0.8), rgba(36, 157, 146, 0.8));
+    transition: left 0.3s ease;
+}
+
+.withdraw::before {
+    background: linear-gradient(to right, rgba(36, 157, 146, 0.8), rgba(36, 157, 146, 0.8));
+}
+
+.deposit:hover::before, .withdraw:hover::before {
+    left: 0;
+}
+
+.deposit:hover a {
+    color: #f0f0f0; /* Новый цвет текста при наведении для "Пополнить" */
+}
+
+.withdraw:hover a {
+    color: white; /* Новый цвет текста при наведении для "Вывести" */
+}
+
+.deposit {
+    background-color: #249D92;
+    color: white;
+}
+
+.deposit {
+    background-color: #249D92;
+    color: white;
+}
+
+.crypto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-size: 20px;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.crypto-name {
+    display: flex;
+    justify-content: left;
+}
+
+
+
+.crypto h1 {
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 30px;
+}
+
+.crypto-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.crypto-currence {
+    margin: 20px;
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+    will-change: transform, box-shadow;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.crypto .img-title {
+    display: flex;
+}
+
+.crypto img {
+    width: 75px;
+}
+
+.crypto-name img {
+    width: 30px;
+    height: 30px;
+    align-self: center;
+}
+
+.title {
+    display: flex;
+    flex-direction: column;
+    margin-left: 25px;
+    align-self: center;
+    font-family: Inter;
+    font-weight: 300;
+    font-size: 25px;
+}
+
+.time-amount {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    margin-top: 20px;
+    font-family: Inter;
+    font-weight: 300;
+    font-size: 20px;
+}
+
+/* withdraw  */
+
+.withdraw-section {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+}
+
+.info {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.info-item span {
+    margin-left: 30px;
+}
+
+.payment-method {
+    background-color: #000;
+    color: #fff;
+    border: 1px solid #249D92;
+    padding: 5px;
+}
+
+.amount-input {
+    background-color: #000;
+    color: #fff;
+    border: 1px solid #249D92;
+    padding: 5px;
+    width: 80px;
+}
+
+.withdraw-button {
+    background-color: #249D92;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
 }

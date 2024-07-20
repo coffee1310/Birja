@@ -10,6 +10,8 @@ urlpatterns = [
     path('logout/', logout_user, name="logout"),
     path('history/', PositionListView.as_view(), name='history'),
     path('profile/', ProfileView.as_view(), name='profile'),
+    path('deposit/', DepositView.as_view(), name="deposit"),
+    path('withdraw/', withdraw, name='withdraw'),
     path('get_bitcoin_data/', get_bitcoin_data),
     path('get_blockchain_data/', get_blockchain_data),
     path('get-crypto-price/<str:symbol>/', get_crypto_price, name='get_crypto_price'),

@@ -1,0 +1,64 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div>
+    <div class="deposit-withdraw">
+        <button class="deposit"><a href="{% url 'deposit' %}">Пополнить</a></button>
+        <button class="withdraw"><a href="{% url 'withdraw' %}">Вывести</a></button>
+    </div>
+</div>
+
+<div class="crypto">
+    <div class="crypto-name">
+        <img src="{% static 'app/img/crypto.png' %}">
+        <h1>Криптовалюты</h1>
+    </div>
+    <div class="crypto-cards">
+        {% for c in crypto %}
+            <div class="crypto-currence card">
+                <div class="img-title">
+                    <img src="{{ c.img.url }}">
+                    <div class="title">
+                        <span>{{ c.name }} (USD)</span>
+                        <span>{{ c.symbol }}</span>
+                    </div>
+                </div>
+                <div class="time-amount">
+                    <span class="money">Min 10$</span>
+                    <span class="time">~10 Min.</span>
+                </div>
+            </div>
+
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const deltaX = (x - centerX) / centerX;
+            const deltaY = (y - centerY) / centerY;
+
+            const angleX = deltaY * 10; 
+            const angleY = -deltaX * 10;
+
+            card.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg)`;
+            card.style.boxShadow = `${deltaX * 20}px ${deltaY * 20}px 20px rgba(0,0,0,0.2)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            card.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)withdraw.html';
+            //card.style.background = 'rgba(36, 157, 146, 0.8)'; 
+        });
+    });
+</script>
+{% endblock %}

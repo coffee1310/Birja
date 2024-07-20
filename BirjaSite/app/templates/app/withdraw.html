@@ -1,0 +1,27 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div>
+    <div class="deposit-withdraw">
+        <button class="withdraw"><a href="{% url 'deposit' %}">Пополнить</a></button>
+        <button class="deposit"><a href="{% url 'withdraw' %}">Вывести</a></button>
+    </div>
+</div>
+<div class="withdraw-section">
+    <div class="info">
+        <div class="info-item">Свободные средства <span>0$</span></div>
+        <div class="info-item">Минимальная сумма вывода <span>10$</span></div>
+        <div class="info-item">Метод оплаты 
+            <select id="payment-method" class="payment-method">
+                <option value="visa">Visa</option>
+                <option value="mastercard">MasterCard</option>
+                <option value="mir">Mir</option>
+            </select>
+        </div>
+        <div class="info-item">Сумма <input type="number" id="amount" class="amount-input" min="10" value="10"></div>
+    </div>
+    
+</div>
+<button class="withdraw-button">Вывести</button>
+{% endblock %}

@@ -128,11 +128,14 @@ STATICFILES_DIRS = []
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'app.CustomUser'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'login'
+
+WEB3_PROVIDER = 'https://mainnet.infura.io/v3/17c0af7f81724e339a9a70b3947fc03a'
+DEPOSIT_ADDRESS = '0xb9ee4f61768f3c499D27a10eB38E689CDEa62561'
+PRIVATE_KEY = 'your-private-key'
+#17c0af7f81724e339a9a70b3947fc03a

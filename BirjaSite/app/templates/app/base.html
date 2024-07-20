@@ -20,11 +20,11 @@
 
 <header class="header">
     <div class="balance">
-        <span>0.00$</span>
-        <button>Пополнить счет<img src="{% static 'app/img/wallet.png' %}"></button>
+        <span>{{ balance }}$</span>
+        <button><a href="{% url 'deposit' %}">Пополнить счет</a><a href="{% url 'deposit' %}"><img src="{% static 'app/img/wallet.png' %}"></a></button>
     </div>
     <div class="profile-icon">
-        <img src="{% static 'app/img/profile_2.png' %}" alt="Профиль">
+        <a href="{% url 'profile' %}"><img src="{% static 'app/img/profile_2.png' %}" alt="Профиль"></a>
     </div>
 </header>
 
@@ -37,12 +37,12 @@
 		            <span><a href="{% url 'trade' %}">Торговля</a></span>
 		        </div>
 		        <div class="menu-item">
-		            <a href="#"><img src="{% static 'app/img/profile_1.png' %}" alt="Профиль"></a>
-		            <span><a href="#">Профиль</a></span>
+		            <a href="{% url 'profile' %}"><img src="{% static 'app/img/profile_1.png' %}" alt="Профиль"></a>
+		            <span><a href="{% url 'profile' %}">Профиль</a></span>
 		        </div>
 		        <div class="menu-item">
-		            <a href="#"><img src="{% static 'app/img/finance.png' %}" alt="Финансы"></a>
-		            <span><a href="#">Финансы</a></span>
+		            <a href="{% url 'deposit' %}"><img src="{% static 'app/img/finance.png' %}" alt="Финансы"></a>
+		            <span><a href="{% url 'deposit' %}">Финансы</a></span>
 		        </div>
 		        <div class="menu-item">
 		            <a href="{% url 'history' %}"><img src="{% static 'app/img/history.png' %}" alt="История"></a>

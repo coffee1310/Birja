@@ -2,36 +2,54 @@
 {% load static %}
 
 {% block content %}
-    <div class="Registration">
-            <form method="post" id="registrationForm">
-                <h1>Регистрация</h1>
-                {% csrf_token %}
-                <div class="form-group">
-                    {{ form.full_name }}
-                    <div class="line"></div>
-                </div>
-                <div class="form-group">
-                    {{ form.email }}
-                    <div class="line"></div>
-                </div>
-                <div class="form-group">
-                    {{ form.phone }}
-                    <div class="line"></div>
-                </div>
-                <div class="form-group">
-                    {{ form.password1 }}
-                    <div class="line"></div>
-                </div>
-                <div class="form-group">
-                    {{ form.password2 }}
-                    <div class="line"></div>
-                </div>
-                <div class="form-group">
-                    {{ form.date_of_birth }}
-                    <div class="line"></div>
-                </div>
-                <button type="submit">Зарегистрироваться</button>
-                <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
-            </form>
+<div class="Registration">
+    <form method="post" id="registrationForm">
+        <h1>Регистрация</h1>
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.full_name }}
+            {% if form.full_name.errors %}
+                <div class="error">{{ form.full_name.errors }}</div>
+            {% endif %}
+            <div class="line"></div>
         </div>
+        <div class="form-group">
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="error">{{ form.email.errors }}</div>
+            {% endif %}
+            <div class="line"></div>
+        </div>
+        <div class="form-group">
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <div class="error">{{ form.phone.errors }}</div>
+            {% endif %}
+            <div class="line"></div>
+        </div>
+        <div class="form-group">
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div class="error">{{ form.password1.errors }}</div>
+            {% endif %}
+            <div class="line"></div>
+        </div>
+        <div class="form-group">
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div class="error">{{ form.password2.errors }}</div>
+            {% endif %}
+            <div class="line"></div>
+        </div>
+        <div class="form-group">
+            {{ form.date_of_birth }}
+            {% if form.date_of_birth.errors %}
+                <div class="error">{{ form.date_of_birth.errors }}</div>
+            {% endif %}
+            <div class="line"></div>
+        </div>
+        <button type="submit">Зарегистрироваться</button>
+        <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+    </form>
+</div>
 {% endblock %}

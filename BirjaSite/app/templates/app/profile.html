@@ -6,51 +6,75 @@
     <h1>Профиль</h1>
     <form method="post" class="profile-form">
         {% csrf_token %}
-        <div>
+        <div class="form-group">
             <label for="id_full_name">ФИО:</label>
-            {{ form.full_name }}
-            <button type="button" onclick="editField('id_full_name')">Редактировать</button>
+            <input type="text" id="id_full_name" name="full_name" value="{{ user.full_name }}" readonly>
+            <button type="button" onclick="toggleEdit('id_full_name')"><img src="{% static 'app/img/edit.png' %}"></button>
         </div>
-        <div>
+        <hr>
+        <div class="form-group">
             <label for="id_email">Эл. почта:</label>
-            {{ form.email }}
-            <button type="button" onclick="editField('id_email')">Редактировать</button>
+            <input type="email" id="id_email" name="email" value="{{ user.email }}" readonly>
+            <button type="button" onclick="toggleEdit('id_email')"><img src="{% static 'app/img/edit.png' %}"></button>
         </div>
-        <div>
+        <hr>
+        <div class="form-group">
             <label for="id_date_of_birth">Дата рождения:</label>
-            {{ form.date_of_birth }}
-            <button type="button" onclick="editField('id_date_of_birth')">Редактировать</button>
+            <input type="date" id="id_date_of_birth" name="date_of_birth" value="{{ user.date_of_birth|date:'Y-m-d' }}" readonly>
+            <button type="button" onclick="toggleEdit('id_date_of_birth')"><img src="{% static 'app/img/edit.png' %}"></button>
         </div>
-        <div>
+        <hr>
+        <div class="form-group">
+            <label>Дата создания аккаунта:</label>
+            <span>{{ user.date_joined }}</span>
+        </div>
+        <hr>
+        <div class="form-group">
             <label>Дата последней сделки:</label>
             <span>{{ last_trade_date }}</span>
         </div>
-        <div>
+        <hr>
+        <div class="form-group">
             <label>Любимая криптовалюта:</label>
             <span>{{ favorite_crypto }}</span>
         </div>
-        <div>
+        <hr>
+        <div class="form-group">
             <label>Самый прибыльный день:</label>
             <span>{{ most_profitable_day }}</span>
         </div>
-        <div>
+        <hr>
+        <div class="form-group">
             <label>Выведено средств:</label>
             <span>{{ total_withdrawn }}</span>
         </div>
+        <hr>
         <button type="submit">Сохранить</button>
+        {% if form.errors %}
+            <div class="form-errors">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        <li>{{ field }}: {{ errors|striptags }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     </form>
 </div>
 
 <script>
-    function editField(fieldId) {
+    function toggleEdit(fieldId) {
         const field = document.getElementById(fieldId);
-        field.removeAttribute('readonly');
-        field.focus();
+        const isReadOnly = field.hasAttribute('readonly');
+        
+        if (isReadOnly) {
+            field.removeAttribute('readonly');
+            field.dataset.initialValue = field.value; // Сохраняем начальное значение
+        } else {
+            field.setAttribute('readonly', 'readonly');
+            field.value = field.dataset.initialValue; // Возвращаем начальное значение
+        }
     }
 </script>
 
 {% endblock %}
-
-<style>
-    
-</style>

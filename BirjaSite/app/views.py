@@ -10,6 +10,8 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.views import View
 from decimal import Decimal
 import threading
 import time
@@ -30,12 +32,15 @@ class indexPage(TemplateView):
         return self.render_to_response(context)
 
 
-class tradePage(TemplateView):
+class tradePage(LoginRequiredMixin, TemplateView):
     template_name = "app/trade.html"
+    login_url = '/login'
+    redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['cryptos'] = CryptoCurrency.objects.all()
+        context['balance'] = self.request.user.balance
         return context
 
     @method_decorator(login_required)
@@ -104,7 +109,6 @@ class tradePage(TemplateView):
 
 class RegistrationPage(CreateView):
     template_name = "app/registration.html"
-
     model = CustomUser
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('index')
@@ -113,6 +117,16 @@ class RegistrationPage(CreateView):
         response = super().form_valid(form)
         login(self.request, self.object)
         return response
+
+    def form_invalid(self, form):
+        context = self.get_context_data(form=form)
+        context['form_errors'] = form.errors.as_json()
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['balance'] = self.request.user.balance
+        return context
 
 class LoginPage(LoginView):
     form_class = CustomLoginForm
@@ -126,10 +140,17 @@ class LoginPage(LoginView):
     def get_success_url(self):
         return reverse_lazy("index")
 
-class PositionListView(ListView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['balance'] = self.request.user.balance
+        return context
+
+class PositionListView(LoginRequiredMixin, ListView):
     model = Position
     template_name = 'app/history.html'
     context_object_name = 'positions'
+    login_url = '/login'
+    redirect_field_name = 'redirect_to'
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(user=self.request.user)
@@ -160,32 +181,62 @@ class PositionListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = PositionFilterForm(self.request.GET)
+        context['balance'] = self.request.user.balance
         return context
 
 class ProfileView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'app/profile.html'
     context_object_name = 'user'
+    login_url = '/login'
+    redirect_field_name = 'redirect_to'
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         return self.request.user
 
     def post(self, request, *args, **kwargs):
-        user = self.get_object()
-        form = ProfileForm(request.POST, instance=user)
+        self.object = self.get_object()
+        form = ProfileForm(request.POST, instance=self.object)
+
         if form.is_valid():
             form.save()
-            return redirect('profile')
+            messages.success(request, 'Profile updated successfully')
+            return redirect('trade')
+        else:
+            messages.error(request, 'Please correct the error below.')
+
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = ProfileForm(instance=self.object)
         context['last_trade_date'] = self.object.last_trade_date
         context['favorite_crypto'] = self.object.favorite_crypto
         context['most_profitable_day'] = self.object.most_profitable_day
         context['total_withdrawn'] = self.object.total_withdrawn
+        context['balance'] = self.request.user.balance
+        if 'form' not in context:
+            context['form'] = ProfileForm(instance=self.object)
         return context
+
+
+class DepositView(View):
+    def get(self, request):
+        form = DepositForm()
+        crypto = CryptoCurrency.objects.all()
+        balance = self.request.user.balance
+        return render(request, 'app/deposit.html', {'form': form, 'crypto':crypto, 'balance':balance})
+
+    def post(self, request):
+        form = DepositForm(request.POST)
+        balance = self.request.user.balance
+        if form.is_valid():
+            wallet_address = form.cleaned_data['wallet_address']
+            amount = form.cleaned_data['amount']
+            return redirect('success_page')
+        return render(request, 'app/deposit.html', {'form': form, 'balance':balance})
+
+def withdraw(request):
+    return render(request, 'app/withdraw.html')
 
 def get_bitcoin_data(request):
     url = 'https://api.blockchain.com/charts/market-price'
