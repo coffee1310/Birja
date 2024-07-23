@@ -8,17 +8,17 @@ class CustomUserCreationForm(UserCreationForm):
         model = CustomUser
         fields = ('full_name', 'email', 'phone', 'date_of_birth', 'password1', 'password2')
         widgets = {
-            'full_name': forms.TextInput(attrs={'placeholder': 'ФИО'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'Эл. почта'}),
-            'phone': forms.TextInput(attrs={'placeholder': 'Телефон'}),
-            'date_of_birth': forms.DateInput(attrs={'placeholder': 'Дата рождения', 'type': 'date'}),
-            'password1': forms.PasswordInput(attrs={'placeholder': 'Пароль'}),
-            'password2': forms.PasswordInput(attrs={'placeholder': 'Подтвердите пароль'}),
+            'full_name': forms.TextInput(attrs={'placeholder': 'Full Name'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Email'}),
+            'phone': forms.TextInput(attrs={'placeholder': 'Phone'}),
+            'date_of_birth': forms.DateInput(attrs={'placeholder': 'Date of Birth', 'type': 'date'}),
+            'password1': forms.PasswordInput(attrs={'placeholder': 'Password'}),
+            'password2': forms.PasswordInput(attrs={'placeholder': 'Confirm Password'}),
         }
 
 class CustomLoginForm(AuthenticationForm):
-    username = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Эл. почта'}), label='Эл. почта')
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Пароль'}), label='Пароль')
+    username = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Email'}), label='Email')
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}), label='Password')
 
     def clean(self):
         email = self.cleaned_data.get('username')
@@ -27,9 +27,9 @@ class CustomLoginForm(AuthenticationForm):
         if email and password:
             self.user_cache = authenticate(self.request, username=email, password=password)
             if self.user_cache is None:
-                raise forms.ValidationError("Пожалуйста, введите правильный адрес электронной почты и пароль. Оба поля могут быть чувствительны к регистру.")
+                raise forms.ValidationError("Please enter a correct email and password. Note that both fields may be case-sensitive.")
         else:
-            raise forms.ValidationError("Оба поля должны быть заполнены.")
+            raise forms.ValidationError("Both fields are required.")
         return self.cleaned_data
 
     def get_user(self):
@@ -47,24 +47,25 @@ class PositionForm(forms.ModelForm):
 
 class PositionFilterForm(forms.Form):
     PERIOD_CHOICES = [
-        ('all_time', 'За все время'),
-        ('year', 'За год'),
-        ('month', 'За месяц'),
+        ('all_time', 'All time'),
+        ('year', 'Year'),
+        ('month', 'Month'),
     ]
     OUTCOME_CHOICES = [
-        ('any', 'Любой исход'),
-        ('positive', 'Положительный'),
-        ('negative', 'Отрицательный'),
+        ('any', 'Any outcome'),
+        ('positive', 'Positive'),
+        ('negative', 'Negative'),
     ]
     POSITION_TYPE_CHOICES = [
-        ('all', 'Все типы операций'),
-        ('long', 'Длинная'),
-        ('short', 'Короткая'),
+        ('all', 'All types of operations'),
+        ('long', 'Long'),
+        ('short', 'Short'),
     ]
 
-    period = forms.ChoiceField(choices=PERIOD_CHOICES, label="Период", required=False)
-    outcome = forms.ChoiceField(choices=OUTCOME_CHOICES, label="Исход", required=False)
-    position_type = forms.ChoiceField(choices=POSITION_TYPE_CHOICES, label="Тип операции", required=False)
+    period = forms.ChoiceField(choices=PERIOD_CHOICES, label="Period", required=False)
+    outcome = forms.ChoiceField(choices=OUTCOME_CHOICES, label="Outcome", required=False)
+    position_type = forms.ChoiceField(choices=POSITION_TYPE_CHOICES, label="Operation Type", required=False)
+
 
 class ProfileForm(forms.ModelForm):
     date_of_birth = forms.DateField(

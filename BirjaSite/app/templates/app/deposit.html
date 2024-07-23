@@ -4,19 +4,19 @@
 {% block content %}
 <div>
     <div class="deposit-withdraw">
-        <button class="deposit"><a href="{% url 'deposit' %}">Пополнить</a></button>
-        <button class="withdraw"><a href="{% url 'withdraw' %}">Вывести</a></button>
+        <button class="deposit"><a href="{% url 'deposit' %}">Deposit</a></button>
+        <button class="withdraw"><a href="{% url 'withdraw' %}">Withdraw</a></button>
     </div>
 </div>
 
 <div class="crypto">
     <div class="crypto-name">
         <img src="{% static 'app/img/crypto.png' %}">
-        <h1>Криптовалюты</h1>
+        <h1>Cryptocurrencies</h1>
     </div>
     <div class="crypto-cards">
         {% for c in crypto %}
-            <div class="crypto-currence card">
+            <div class="crypto-currency card">
                 <div class="img-title">
                     <img src="{{ c.img.url }}">
                     <div class="title">
@@ -25,15 +25,13 @@
                     </div>
                 </div>
                 <div class="time-amount">
-                    <span class="money">Min 10$</span>
+                    <span class="money">Min $10</span>
                     <span class="time">~10 Min.</span>
                 </div>
             </div>
-
         {% endfor %}
     </div>
 </div>
-
 <script>
     document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('mousemove', (e) => {

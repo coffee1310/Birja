@@ -3,60 +3,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{title}}</title>
-	<link type="text/css" href="{% static 'app/css/style.css' %}" rel="stylesheet" />
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
-	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <title>{{title}}</title>
+    <link type="text/css" href="{% static 'app/css/style.css' %}" rel="stylesheet" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 </head>
 
 <header class="header">
     <div class="balance">
         <span>{{ balance }}$</span>
-        <button><a href="{% url 'deposit' %}">Пополнить счет</a><a href="{% url 'deposit' %}"><img src="{% static 'app/img/wallet.png' %}"></a></button>
+        <button><a href="{% url 'deposit' %}">Deposit</a><a href="{% url 'deposit' %}"><img src="{% static 'app/img/wallet.png' %}"></a></button>
     </div>
     <div class="profile-icon">
-        <a href="{% url 'profile' %}"><img src="{% static 'app/img/profile_2.png' %}" alt="Профиль"></a>
+        <a href="{% url 'profile' %}"><img src="{% static 'app/img/profile_2.png' %}" alt="Profile"></a>
     </div>
 </header>
 
 <body class="body">
-	<div class="content">
-		<div class="sidebar">
-			<div class="items">
-		        <div class="menu-item">
-		            <a href="{% url 'trade' %}"><img src="{% static 'app/img/trade.png' %}" alt="Торговля"></a>
-		            <span><a href="{% url 'trade' %}">Торговля</a></span>
-		        </div>
-		        <div class="menu-item">
-		            <a href="{% url 'profile' %}"><img src="{% static 'app/img/profile_1.png' %}" alt="Профиль"></a>
-		            <span><a href="{% url 'profile' %}">Профиль</a></span>
-		        </div>
-		        <div class="menu-item">
-		            <a href="{% url 'deposit' %}"><img src="{% static 'app/img/finance.png' %}" alt="Финансы"></a>
-		            <span><a href="{% url 'deposit' %}">Финансы</a></span>
-		        </div>
-		        <div class="menu-item">
-		            <a href="{% url 'history' %}"><img src="{% static 'app/img/history.png' %}" alt="История"></a>
-		            <span><a href="{% url 'history' %}">История</a></span>
-		        </div>
-		    </div>
-	        <div class="close-sidebar">
-	            <a href="{% url 'logout' %}"><img src="{% static 'app/img/exit.png' %}" alt="Закрыть"></a>
-	        </div>
-	    </div>
-			
-	</div>
-	{% block content %}
-	{% endblock %}
+    <div class="content">
+        <div class="sidebar">
+            <div class="items">
+                <div class="menu-item">
+                    <a href="{% url 'trade' %}"><img src="{% static 'app/img/trade.png' %}" alt="Trade"></a>
+                    <span><a href="{% url 'trade' %}">Trade</a></span>
+                </div>
+                <div class="menu-item">
+                    <a href="{% url 'profile' %}"><img src="{% static 'app/img/profile_1.png' %}" alt="Profile"></a>
+                    <span><a href="{% url 'profile' %}">Profile</a></span>
+                </div>
+                <div class="menu-item">
+                    <a href="{% url 'deposit' %}"><img src="{% static 'app/img/finance.png' %}" alt="Finance"></a>
+                    <span><a href="{% url 'deposit' %}">Finance</a></span>
+                </div>
+                <div class="menu-item">
+                    <a href="{% url 'history' %}"><img src="{% static 'app/img/history.png' %}" alt="History"></a>
+                    <span><a href="{% url 'history' %}">History</a></span>
+                </div>
+            </div>
+            <div class="close-sidebar">
+                <a href="{% url 'logout' %}"><img src="{% static 'app/img/exit.png' %}" alt="Logout"></a>
+            </div>
+        </div>
+    </div>
+    {% block content %}
+    {% endblock %}
 </body>
 
 </html>

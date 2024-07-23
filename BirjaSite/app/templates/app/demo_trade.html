@@ -1,0 +1,170 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<select id="cryptoSelect" class="cryptoSelect">
+    {% for crypto in cryptos %}
+        <option value="{{ crypto.symbol }}">{{ crypto.name }}</option>
+    {% endfor %}
+</select>
+<select id="chartType">
+    <option value="line">Line Chart</option>
+    <option value="candlestick">Candlestick</option>
+</select>
+
+<select id="timeRangeButtons" class="timeRangeButtons">
+    <option value="6m">6 months</option>
+    <option value="1m">1 month</option>
+    <option value="1w">1 week</option>
+    <option value="1d">1 day</option>
+    <option value="1h">1 hour</option>
+</select>
+
+<div class="chart-container">
+    <div class="trade-controls">
+        <div class="timer-menu">
+            <button id="timer-toggle">Select Time</button>
+            <div id="timer-settings" class="timer-settings hidden">
+                <div class="timer-settings-2">
+                    <div class="timer-control">
+                        <button id="hours-inc">+</button>
+                        <span id="hours">00</span>
+                        <button id="hours-dec">-</button>
+                    </div>
+                    <div class="timer-control">
+                        <button id="minutes-inc">+</button>
+                        <span id="minutes">00</span>
+                        <button id="minutes-dec">-</button>
+                    </div>
+                    <div class="timer-control">
+                        <button id="seconds-inc">+</button>
+                        <span id="seconds">00</span>
+                        <button id="seconds-dec">-</button>
+                    </div>
+                </div>
+            </div>
+            <span id="timer-display">00:00:00</span>
+        </div>
+        <div class="amount">
+            <input type="number" id="amount" value="1" min="0.01" step="0.01">
+            <span>Amount</span>
+        </div>
+        <div class="buttons">
+            <button class="higher" onclick="preparePosition('long')"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
+            <button class="lower" onclick="preparePosition('short')"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
+        </div>
+    </div>
+</div>
+
+<div class="graphic">
+    <canvas id="cryptoChart"></canvas>
+</div>
+
+<script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/js/timer.js' %}"></script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+    const cryptoSelect = document.getElementById('cryptoSelect');
+    const amountInput = document.getElementById('amount');
+    const timerDisplay = document.getElementById('timer-display');
+
+    window.preparePosition = function(positionType) {
+        const amount = parseFloat(amountInput.value);
+        checkUserBalance(amount)
+            .then(balanceOk => {
+                if (balanceOk) {
+                    startTimer();
+                    openPosition(positionType, amount);
+                } else {
+                }
+            })
+            .catch(error => console.error('Error checking balance:', error));
+    };
+
+    function checkUserBalance(amount) {
+        const csrftoken = getCookie('csrftoken');
+        return fetch('/check_demo_balance/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ amount: amount })
+        })
+        .then(response => response.json())
+        .then(data => data.balance_ok)
+        .catch(error => {
+            console.error('Error checking balance:', error);
+            return false;
+        });
+    }
+
+    function startTimer() {
+        const hours = parseInt(document.getElementById('hours').textContent, 10);
+        const minutes = parseInt(document.getElementById('minutes').textContent, 10);
+        const seconds = parseInt(document.getElementById('seconds').textContent, 10);
+        const totalTime = (hours * 3600) + (minutes * 60) + seconds;
+
+        let timeLeft = totalTime;
+        const timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                return;
+            }
+
+            timeLeft--;
+            const hrs = Math.floor(timeLeft / 3600);
+            const mins = Math.floor((timeLeft % 3600) / 60);
+            const secs = timeLeft % 60;
+
+            timerDisplay.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    window.openPosition = function(positionType, amount) {
+        const symbol = cryptoSelect.value;
+        const duration = parseInt(timerDisplay.textContent.split(':').reduce((acc, time) => (60 * acc) + +time));
+
+        const csrftoken = getCookie('csrftoken');
+
+        fetch('/demo_trade/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                crypto: symbol,
+                amount: amount,
+                duration: duration,
+                position_type: positionType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Position opened successfully!');
+            } else {
+                console.log('Error opening position: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error opening position:', error));
+    };
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

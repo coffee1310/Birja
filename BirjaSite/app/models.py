@@ -30,7 +30,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=15, unique=True)
     date_of_birth = models.DateField()
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    demo_balance = models.DecimalField(max_digits=10, decimal_places=2, default=50000)
     profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    demo_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -77,8 +79,8 @@ class CryptoCurrency(models.Model):
 
 class Position(models.Model):
     POSITION_TYPES = (
-        ('long', 'Длинная'),
-        ('short', 'Короткая'),
+        ('long', 'Long'),
+        ('short', 'Short'),
     )
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

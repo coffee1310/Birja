@@ -3,32 +3,36 @@
 
 {% block content %}
 <div class="history">
-    <h1>История сделок</h1>
+    <h1>Trade History</h1>
     <form method="get" class="filter-form">
         {{ form.as_p }}
-        <button type="submit">Применить</button>
+        <button type="submit">Apply</button>
     </form>
+    {% if positions|length > 0 %}
     <table>
         <thead>
             <tr>
-                <th>Криптовалюта</th>
-                <th>Дата</th>
-                <th>Цена открытия</th>
-                <th>Прибыль</th>
-                <th>Тип операции</th>
+                <th>Cryptocurrency</th>
+                <th>Date</th>
+                <th>Open Price</th>
+                <th>Profit</th>
+                <th>Operation Type</th>
             </tr>
         </thead>
         <tbody>
-            {% for position in positions %}
-            <tr>
-                <td>{{ position.crypto.name }}</td>
-                <td>{{ position.open_time }}</td>
-                <td>{{ position.open_price }}</td>
-                <td>{{ position.profit }}</td>
-                <td>{{ position.get_position_type_display }}</td>
-            </tr>
-            {% endfor %}
+                {% for position in positions %}
+                <tr>
+                    <td>{{ position.crypto.name }}</td>
+                    <td>{{ position.open_time }}</td>
+                    <td>{{ position.open_price }}</td>
+                    <td>{{ position.profit }}</td>
+                    <td>{{ position.get_position_type_display }}</td>
+                </tr>
+                {% endfor %}
         </tbody>
     </table>
+    {% else %}
+        <h1>You have not made any trades</h1>
+    {% endif %}
 </div>
 {% endblock %}

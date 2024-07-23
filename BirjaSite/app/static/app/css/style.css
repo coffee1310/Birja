@@ -14,7 +14,7 @@ section {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background: #000;
+    background: #12423E;
     color: #fff;
 }
 
@@ -42,7 +42,7 @@ section {
     justify-content: space-between;
     align-items: center;
     padding: 0 5vw; /* Отступы в зависимости от ширины экрана */
-    background: url('../img/crypto_black_bcg.png') repeat;
+    background: #151515;
     background-size: 20%;
     color: #fff;
     font-family: Roboto, sans-serif;
@@ -86,8 +86,8 @@ section {
     background: #ddd;
 }
 
-.information {
-    background: url(../img/crypto_bcg.png) repeat;
+.advantages {
+    background: #ACE2DB;
     background-size: 20%;
 }
 
@@ -100,6 +100,7 @@ section {
 .advantages h2, .why-us h2 {
     font-size: 3.5vw; /* Размер шрифта в зависимости от ширины экрана */
     margin-bottom: 20px;
+    color: #12423E;
 }
 
 .advantages ul, .why-us ul {
@@ -108,6 +109,7 @@ section {
     margin: 0;
     display: flex;
     flex-wrap: wrap;
+    color: #12423E;
 }
 
 .advantages ul li, .why-us ul li {
@@ -117,6 +119,7 @@ section {
     margin: 5px; 
     margin-top: 25px;
     padding: 0;
+    color: #12423E;
 }
 
 .advantage, .reasons {
@@ -466,11 +469,18 @@ section {
     font-size: 20px;
 }
 
+.buttons button {
+    width: 150px;
+}
+
 .graphic {
     margin-left: 70px; 
-    margin-bottom: 50px; 
+    margin-bottom: 50px;
+    top: 100px;
+    position: absolute;
     width: calc(100% - 200px - 70px);
     height: calc(100vh - 100px);
+    z-index: -5;
 }
 
 
@@ -481,6 +491,19 @@ section {
 .cryptoSelect {
     margin-top: 100px;
     margin-left: 150px;
+    position: absolute;
+    background-color: #249D92;
+    color: #FFFFFF;
+    width: 150px;
+    height: 30px;
+    border: 0;
+    border-radius: 5px;
+    opacity: 0.7;
+}
+
+#chartType {
+    margin-top: 100px;
+    margin-left: 350px;
     position: absolute;
     background-color: #249D92;
     color: #FFFFFF;
@@ -621,6 +644,97 @@ section {
     border: 0;
 }
 
+.timeRangeButtons {
+    margin-top: 100px;
+    margin-left: 550px;
+    position: absolute;
+    background-color: #249D92;
+    color: #FFFFFF;
+    width: 150px;
+    height: 30px;
+    border: 0;
+    border-radius: 5px;
+    opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 50px;
+    }
+
+    .graphic {
+        margin-left: 50px;
+        width: calc(100% - 50px);
+    }
+
+    .cryptoSelect, #chartType {
+        margin-left: 10px;
+        width: 120px;
+    }
+
+    .header .balance span {
+        font-size: 16px;
+    }
+
+    .balance button {
+        font-size: 13px;
+    }
+
+    .header .profile-icon img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .chart-container {
+        width: 170px;
+    }
+
+    #timer-toggle {
+        font-size: 1em;
+    }
+
+    .buttons button {
+        width: 150px;
+    }
+
+    .buttons {
+        font-size: 1em;
+    }
+
+    .buttons strong {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 40px;
+    }
+
+    .graphic {
+        margin-left: 40px;
+        width: calc(100% - 40px);
+    }
+
+    .cryptoSelect, #chartType {
+        margin-left: 5px;
+        width: 100px;
+    }
+
+    .header .balance span {
+        font-size: 14px;
+    }
+
+    .balance button {
+        font-size: 12px;
+    }
+
+    .header .profile-icon img {
+        width: 25px;
+        height: 25px;
+    }
+}
+
 /* Registration  */
 
 .container {
@@ -733,6 +847,40 @@ input[type="date"]::placeholder {
     color: white;
 }
 
+@media (max-width: 1200px) {
+    .Registration form, .Login form {
+        width: 40%;
+    }
+}
+
+@media (max-width: 768px) {
+    .Registration form, .Login form {
+        width: 60%;
+    }
+}
+
+@media (max-width: 576px) {
+    .Registration form, .Login form {
+        width: 80%;
+    }
+
+    .Registration h1, .Login h1 {
+        font-size: 24px;
+    }
+
+    .Registration button, .Login button {
+        font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="date"] {
+        font-size: 14px;
+    }
+}
+
 /* History  */
 
 .filter-form {
@@ -804,13 +952,49 @@ tbody {
     vertical-align: middle;
 }
 
+@media (max-width: 768px) {
+    .filter-form {
+        display: flex;
+        justify-content: center; 
+        width: 100%;
+    }
+
+    thread {
+        width: 20%;
+    }
+
+    .filter-form button {
+        width: auto;
+        flex: none; 
+    }
+}
+
+@media (max-width: 576px) {
+    .filter-form {
+        flex-direction: column; 
+        align-items: center;
+    }
+
+    .filter-form p, .filter-form select, .filter-form button {
+        margin: 10px 0; 
+        width: 100%; 
+    }
+
+    table th, table td {
+        white-space: normal;
+    }
+}
+
 /* Profile  */
 
 .profile {
     padding: 20px;
     margin: 0 auto;
-    max-width: 800px;
+    max-width: 900px;
     border-radius: 8px;
+    background-color: #151515;
+    height: 100vh;
+    width: 50%;
 }
 
 .profile h1 {
@@ -982,7 +1166,7 @@ tbody {
     width: 100%;
 }
 
-.crypto-currence {
+.crypto-currency {
     margin: 20px;
     transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
     will-change: transform, box-shadow;
@@ -1022,6 +1206,58 @@ tbody {
     font-family: Inter;
     font-weight: 300;
     font-size: 20px;
+}
+
+@media (max-width: 768px) {
+    .crypto h1 {
+        font-size: 24px;
+    }
+
+    .title {
+        font-size: 20px;
+        margin-left: 15px;
+    }
+
+    .time-amount {
+        font-size: 18px;
+    }
+
+    .crypto img {
+        width: 60px;
+    }
+
+    .crypto-name img {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+@media (max-width: 576px) {
+    .crypto {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .crypto-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .crypto-currence {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .title {
+        font-size: 18px;
+        margin-left: 10px;
+    }
+
+    .time-amount {
+        font-size: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 /* withdraw  */
@@ -1075,4 +1311,231 @@ tbody {
     display: flex;
     justify-content: center;
     margin: 0 auto;
+}
+
+/* fast start*/
+
+.body-2 {
+    background: #151515;
+
+}
+
+.hero-2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5vw;
+    background: #151515;
+    background-size: 20%;
+    color: #fff;
+    font-family: Roboto, sans-serif;
+    font-weight: lighter;
+    height: 100vh;
+}
+
+
+.steps {
+    padding: 50px;
+    background: white;
+    background-size: 20%;
+    text-align: center;
+    background-color: white;
+}
+
+.steps h2 {
+    font-size: 45px;
+    margin-bottom: 40px;
+
+    color: white;
+}
+
+.many-steps {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    vertical-align: middle;
+    background-color: #12423E;
+    height: 150px;
+    padding: 0;
+    color: white;
+    font-size: 30px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    margin-top: 100px;
+}
+
+.step:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.step-number {
+    font-size: 50px;
+    margin: 0 20px;
+}
+
+.step-content {
+    max-width: 500px;
+    text-align: left;
+}
+
+.step-content h3 {
+    font-size: 45px;
+    margin-bottom: 10px;
+    color: #12423E;
+}
+
+.step-content p {
+    font-size: 1em;
+    color: #12423E;
+}
+
+.step-content a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.step-image {
+    margin: 150px;
+}
+
+.hero-content button {
+    padding: 10px 20px;
+    font-size: 1vw; /* Размер шрифта в зависимости от ширины экрана */
+    background: #fff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+}
+
+.hero-content a {
+    text-decoration: none;
+    color: #000;
+}
+
+.more-info {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    .hero-2 {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .hero-2 .hero-content {
+        max-width: 50%;
+    }
+
+    .hero-2-image {
+        max-width: 50%;
+    }
+
+    .step {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .step:nth-child(even) {
+        flex-direction: row-reverse;
+    }
+
+    .step-content {
+        text-align: left;
+        margin-right: 20px;
+    }
+
+    .step-number {
+        font-size: 3em;
+    }
+
+    .step-image {
+        margin: 0;
+        margin-left: 20px;
+    }
+    .hero-2-image img {
+        width: 100%;
+    }
+    .step-image img {
+        width: 100%;
+    }
+}
+
+@media (min-width: 768px) {
+    .hero-2 {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .hero-2 .hero-content {
+        max-width: 50%;
+    }
+
+    .hero-2-image {
+        max-width: 50%;
+    }
+
+    .step {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .step:nth-child(even) {
+        flex-direction: row-reverse;
+    }
+
+    .step-content {
+        text-align: left;
+        margin-right: 20px;
+    }
+
+    .step-number {
+        font-size: 3em;
+    }
+
+    .step-image {
+        margin: 0;
+        margin-left: 20px;
+    }
+    .hero-2-image img{
+        width: 100%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-2 h1 {
+        font-size: 4em;
+    }
+
+    .hero-2 p {
+        font-size: 2em;
+    }
+
+    .many-steps {
+        font-size: 2em;
+    }
+
+    .steps h2 {
+        font-size: 3em;
+    }
+
+    .step-number {
+        font-size: 4em;
+    }
+
+    .step-content h3 {
+        font-size: 2em;
+    }
+
+    .step-content p {
+        font-size: 1.5em;
+    }
 }

@@ -1,0 +1,134 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link type="text/css" href="{% static 'app/css/style.css' %}" rel="stylesheet" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Trade on Financial Markets</title>
+</head>
+<header class="header-home-page">
+    <div class="logo">EXCHANGE</div>
+     <nav>
+        <a href="{% url 'fast_start' %}">Quick Start</a>
+        <a href="{% url 'demo_trade' %}">Free Demo</a>
+    </nav>
+</header>
+<body class="body-2">
+    <section class="hero-2 fade-in">
+        <div class="hero-content">
+            <h1>How to Trade on Financial Markets</h1>
+            <p>with our exchange</p>
+            {% if user.is_authenticated %}
+                <button><a href="{% url 'trade' %}">Trade</a></button>
+            {% else %}
+                <button><a href="{% url 'login' %}">Trade</a></button>
+            {% endif %}
+        </div>
+        <div class="hero-2-image">
+            <img src="{% static 'app/img/monitor-2.png' %}" alt="Boat">
+        </div>
+    </section>
+    <div class="many-steps fade-in">
+        <h2>Start with a few simple steps</h2>
+    </div>
+    <section class="steps">
+        <div class="step fade-in">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Registration</h3>
+                <p>Create a free trading account using your email address and phone number</p>
+                <a href="#" class="learn-more" data-more="more1">Learn More +</a>
+                <div class="more-info" id="more1">
+                    <p>You will receive an email with registration confirmation. Please check your email and confirm the registration.</p>
+                </div>
+            </div>
+            <div class="step-image">
+                <img src="{% static 'app/img/registration.png' %}" alt="Registration" width="400px">
+            </div>
+        </div>
+
+        <div class="step fade-in">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Authorization</h3>
+                <p>Log in to your account and start using all the features of our exchange.</p>
+                <a href="#" class="learn-more" data-more="more2">Learn More +</a>
+                <div class="more-info" id="more2">
+                    <p>Enter your login details. If you don't have an account, register on the website.</p>
+                </div>
+            </div>
+            <div class="step-image">
+                <img src="{% static 'app/img/verification.png' %}" alt="Verification" width="400px">
+            </div>
+        </div>
+
+        <div class="step fade-in">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Top Up</h3>
+                <p>Top up your trading account balance using cryptocurrency.</p>
+                <a href="#" class="learn-more" data-more="more3">Learn More +</a>
+                <div class="more-info" id="more3">
+                    <p>You can use various cryptocurrencies to top up your account balance. Processing time depends on the selected method.</p>
+                </div>
+            </div>
+            <div class="step-image">
+                <img src="{% static 'app/img/phone-2.png' %}" alt="Top Up" width="500px">
+            </div>
+        </div>
+
+        <div class="step fade-in">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>Trade</h3>
+                <p>Trading on our exchange is easy! Select a trading asset, set your preferred chart type. Set the deal amount, purchase time, and place an order for price increase or decrease.</p>
+                <a href="#" class="learn-more" data-more="more4">Learn More +</a>
+                <div class="more-info" id="more4">
+                    <p>Select an asset to trade and analyze the market using available tools and charts. Trading is available 24/7.</p>
+                </div>
+            </div>
+            <div class="step-image">
+                <img src="{% static 'app/img/transaction.png' %}" alt="Trade" width="400px">
+            </div>
+        </div>
+
+        <div class="step fade-in">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h3>Withdraw Funds</h3>
+                <p>You can withdraw your trading account balance at any time without any amount restrictions. Place a withdrawal request using the methods previously used for deposit, and wait for it to be processed and sent.</p>
+                <a href="#" class="learn-more" data-more="more5">Learn More +</a>
+                <div class="more-info" id="more5">
+                    <p>Use the same method you used to top up your balance to withdraw funds. The request processing may take up to several business days.</p>
+                </div>
+            </div>
+            <div class="step-image">
+                <img src="{% static 'app/img/wallet-2.png' %}" alt="Withdraw" width="400px">
+            </div>
+        </div>
+    </section>
+</body>
+<script src="{% static 'app/js/script.js' %}"></script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+    var learnMoreLinks = document.querySelectorAll('.learn-more');
+    
+    learnMoreLinks.forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            var moreInfoId = link.getAttribute('data-more');
+            var moreInfo = document.getElementById(moreInfoId);
+            if (moreInfo.style.display === 'none' || moreInfo.style.display === '') {
+                moreInfo.style.display = 'block';
+                link.textContent = 'Hide -';
+            } else {
+                moreInfo.style.display = 'none';
+                link.textContent = 'Learn More +';
+            }
+        });
+    });
+});
+</script>
+</html>

@@ -2,9 +2,9 @@
 {% load static %}
 
 {% block content %}
-    <div class="Registration" >
+    <div class="Registration">
         <form method="post" id="registrationForm">
-            <h1>Вход</h1>
+            <h1>Login</h1>
             {% csrf_token %}
             {{ form.non_field_errors }}
             <div class="form-group">
@@ -17,8 +17,8 @@
                 {{ form.password }}
                 <div class="line"></div>
             </div>
-            <button type="submit">Войти</button>
-            <p>Нет аккаунта? <a href="{% url 'registration' %}">Регистрация</a></p>
+            <button type="submit">Login</button>
+            <p>Don't have an account? <a href="{% url 'registration' %}">Register</a></p>
         </form>
     </div>
 {% endblock %}

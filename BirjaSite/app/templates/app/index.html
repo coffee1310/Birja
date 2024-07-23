@@ -3,28 +3,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{title}}</title>
-	<link type="text/css" href="{% static 'app/css/style.css' %}" rel="stylesheet" />
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link type="text/css" href="{% static 'app/css/style.css' %}" rel="stylesheet" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <header class="header-home-page">
-    <div class="logo">БИРЖА</div>
+    <div class="logo">EXCHANGE</div>
     <nav>
-        <a href="#">Быстрый старт</a>
-        <a href="#">Бесплатное демо</a>
-        <a href="#">О компании</a>
+        <a href="{% url 'fast_start' %}">Quick Start</a>
+        <a href="{% url 'demo_trade' %}">Free Demo</a>
     </nav>
 </header>
 <body>
-	<section class="hero">
+    <section class="hero">
         <div class="hero-text fade-in">
-            <h1>ВАШ НАДЕЖНЫЙ ПАРТНЕР ДЛЯ ОНЛАЙН-ТОРГОВЛИ НА ФИНАНСОВЫХ РЫНКАХ</h1>
-            <p>Торговля с удобством и простотой. Более 100 мировых активов в вашем распоряжении</p>
+            <h1>YOUR RELIABLE PARTNER FOR ONLINE TRADING ON FINANCIAL MARKETS</h1>
+            <p>Trade with convenience and ease. Over 100 global assets at your disposal</p>
             {% if user.is_authenticated %}
-                <button><a href="{% url 'trade' %}">Торговать</a></button>
+                <button><a href="{% url 'trade' %}">Trade</a></button>
             {% else %}
-                <button><a href="{% url 'login' %}">Торговать</a></button>
+                <button><a href="{% url 'login' %}">Trade</a></button>
             {% endif %}
         </div>
         <div class="hero-image fade-in">
@@ -32,44 +31,44 @@
         </div>
     </section>
     <div class="information fade-in">
-	    <section class="advantages">
-	        <div class="advantage">
-	            <h2>ОФОРМЛЯЙТЕ ТОРГОВЫЕ ОРДЕРА С МАКСИМАЛЬНО ВЫГОДНЫМИ УСЛОВИЯМИ</h2>
-	            <ul>
-	                <li><strong class="count-up" data-target="150">0$</strong> МИНИМАЛЬНАЯ СУММА ИНВЕСТИЦИИ</li>
-	                <li><strong>0,1$</strong> МИНИМАЛЬНАЯ СУММА СДЕЛКИ</li>
-	                <li><strong class="count-up" data-target="10">0$</strong> МИНИМАЛЬНАЯ СУММА ВЫВОДА</li>
-	                <li><strong class="count-up" data-target="50">0+</strong> КРИПТОВАЛЮТ НА ВЫБОР</li>
-	            </ul>
-	        </div>
-	        <div class="advantage-image">
-	        	<img src="{% static 'app/img/phone.png' %}" alt="Chart Screen">
-	    	</div>
-	    </section>
-	    <section class="why-us fade-in">
+        <section class="advantages">
+            <div class="advantage">
+                <h2>PLACE TRADING ORDERS WITH MAXIMUM BENEFICIAL CONDITIONS</h2>
+                <ul>
+                    <li><strong class="count-up" data-target="150">$0</strong> MINIMUM INVESTMENT AMOUNT</li>
+                    <li><strong>$0.1</strong> MINIMUM DEAL AMOUNT</li>
+                    <li><strong class="count-up" data-target="10">$0</strong> MINIMUM WITHDRAWAL AMOUNT</li>
+                    <li><strong class="count-up" data-target="50">50+</strong> CRYPTOCURRENCIES TO CHOOSE FROM</li>
+                </ul>
+            </div>
+            <div class="advantage-image">
+                <img src="{% static 'app/img/phone.png' %}" alt="Chart Screen">
+            </div>
+        </section>
+        <section class="why-us fade-in">
         <div class="advantage">
-            <h2>ПОЧЕМУ ИМЕННО МЫ?</h2>
+            <h2>WHY CHOOSE US?</h2>
             <ul>
                 <li>
-                    <h3>УДОБНЫЙ ИНТЕРФЕЙС</h3>
-                    <p>Наш понятный интерфейс создан для того, чтобы сделать процесс торговли максимально простым и комфортным.</p>
+                    <h3>USER-FRIENDLY INTERFACE</h3>
+                    <p>Our intuitive interface is designed to make the trading process as simple and comfortable as possible.</p>
                 </li>
                 <li>
-                    <h3>ВЫСОКАЯ БЕЗОПАСНОСТЬ</h3>
-                    <p>Мы обеспечиваем высокий уровень безопасности для ваших активов, используя передовые технологии шифрования.</p>
+                    <h3>HIGH SECURITY</h3>
+                    <p>We ensure a high level of security for your assets using advanced encryption technologies.</p>
                 </li>
                 <li>
-                    <h3>КОНКУРЕНТНЫЕ УСЛОВИЯ ТОРГОВЛИ</h3>
-                    <p>Размещайте торговые ордера на максимально выгодных условиях, управляя своими сделками с максимальной выгодой.</p>
+                    <h3>COMPETITIVE TRADING CONDITIONS</h3>
+                    <p>Place trading orders under the most advantageous conditions, managing your deals with maximum benefit.</p>
                 </li>
                 <li>
-                    <h3>БЫСТРЫЕ ТРАНЗАКЦИИ</h3>
-                    <p>Мы обеспечиваем быстрые и надежные транзакции, чтобы вы могли мгновенно реагировать на изменения рынка.</p>
+                    <h3>FAST TRANSACTIONS</h3>
+                    <p>We provide fast and reliable transactions so you can instantly react to market changes.</p>
                 </li>
             </ul>
         </div>
-	    </section>
-	</div>
-	 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
-</body>	
+        </section>
+    </div>
+     <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
+</body> 
 </html>

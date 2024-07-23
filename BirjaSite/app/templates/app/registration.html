@@ -4,7 +4,7 @@
 {% block content %}
 <div class="Registration">
     <form method="post" id="registrationForm">
-        <h1>Регистрация</h1>
+        <h1>Registration</h1>
         {% csrf_token %}
         <div class="form-group">
             {{ form.full_name }}
@@ -48,8 +48,8 @@
             {% endif %}
             <div class="line"></div>
         </div>
-        <button type="submit">Зарегистрироваться</button>
-        <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+        <button type="submit">Register</button>
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
     </form>
 </div>
 {% endblock %}

@@ -4,7 +4,9 @@ from .views import *
 
 urlpatterns = [
     path('', indexPage.as_view(), name="index"),
+    path('fast_start/', fastStartPage.as_view(), name="fast_start"),
     path('trade/', tradePage.as_view(), name="trade"),
+    path('demo_trade/', demoTradePage.as_view(), name="demo_trade"),
     path('registration/', RegistrationPage.as_view(), name="registration"),
     path('login/', LoginPage.as_view(), name="login"),
     path('logout/', logout_user, name="logout"),
@@ -17,4 +19,5 @@ urlpatterns = [
     path('get-crypto-price/<str:symbol>/', get_crypto_price, name='get_crypto_price'),
     path('update-profits/', update_profits, name='update_profits'),
     path('check_balance/', check_balance, name='check_balance'),
+    path('check_demo_balance/', check_demo_balance, name="check_demo_balance")
 ]
