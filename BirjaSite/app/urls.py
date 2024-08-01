@@ -18,6 +18,8 @@ urlpatterns = [
     path('get_blockchain_data/', get_blockchain_data),
     path('get-crypto-price/<str:symbol>/', get_crypto_price, name='get_crypto_price'),
     path('update-profits/', update_profits, name='update_profits'),
+    path('update_demo_balance/', update_demo_balance, name='update_demo_balance'),
+    path('update_balance/', update_balance, name='update_balance'),
     path('check_balance/', check_balance, name='check_balance'),
     path('check_demo_balance/', check_demo_balance, name="check_demo_balance")
 ]

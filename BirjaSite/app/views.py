@@ -90,31 +90,38 @@ class tradePage(LoginRequiredMixin, TemplateView):
 
     def process_position(self, position_id):
         position = Position.objects.get(id=position_id)
-        user = position.user
 
+        user = position.user
         if user.balance < position.amount:
-            position = position.delete()
+            redirect('deposit')
+            position.delete()
             return 0
+
         user.balance -= position.amount
         time.sleep(position.duration)
         current_price = Decimal(self.get_current_price(position.crypto.symbol))
+
+        payout_percent = Decimal(0.70)
+
         if position.position_type == 'long':
-            profit = (current_price - Decimal(position.open_price)) / current_price * position.amount
+            if current_price > Decimal(position.open_price):
+                profit = Decimal(position.amount) * payout_percent
+            else:
+                profit = -Decimal(position.amount)
         else:
-            profit = (Decimal(position.open_price) - current_price) / Decimal(position.open_price) * position.amount
+            if current_price < Decimal(position.open_price):
+                profit = Decimal(position.amount) * payout_percent
+            else:
+                profit = -Decimal(position.amount)
 
         position.profit = profit
         position.closed = True
         position.save()
 
-        user = position.user
-        user.balance += Decimal(profit) + Decimal(position.amount)
+        user.balance += Decimal(profit) + position.amount if profit > 0 else 0
         user.profit += Decimal(profit)
         user.save()
 
-        print(current_price)
-        print(position.open_price)
-        print(profit)
 
 class demoTradePage(LoginRequiredMixin, TemplateView):
     template_name = "app/demo_trade.html"
@@ -150,7 +157,6 @@ class demoTradePage(LoginRequiredMixin, TemplateView):
             )
 
             threading.Thread(target=self.process_position, args=(position.id,)).start()
-
             return JsonResponse({'status': 'success'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
@@ -164,25 +170,34 @@ class demoTradePage(LoginRequiredMixin, TemplateView):
 
     def process_position(self, position_id):
         position = Position.objects.get(id=position_id)
-        user = position.user
 
+        user = position.user
         if user.demo_balance < position.amount:
-            position = position.delete()
+            position.delete()
             return 0
+
         user.demo_balance -= position.amount
         time.sleep(position.duration)
         current_price = Decimal(self.get_current_price(position.crypto.symbol))
+
+        payout_percent = Decimal(0.70)
+
         if position.position_type == 'long':
-            profit = (current_price - Decimal(position.open_price)) / current_price * position.amount
-        else:
-            profit = (Decimal(position.open_price) - current_price) / Decimal(position.open_price) * position.amount
+            if current_price > Decimal(position.open_price):
+                profit = Decimal(position.amount) * payout_percent
+            else:
+                profit = -Decimal(position.amount)
+        else:  # short position
+            if current_price < Decimal(position.open_price):
+                profit = Decimal(position.amount) * payout_percent
+            else:
+                profit = -Decimal(position.amount)
 
         position.demo_profit = profit
         position.closed = True
         position.save()
 
-        user = position.user
-        user.demo_balance += Decimal(profit) + Decimal(position.amount)
+        user.demo_balance += Decimal(profit) + position.amount if profit > 0 else 0
         user.demo_profit += Decimal(profit)
         user.save()
 
@@ -191,6 +206,11 @@ class RegistrationPage(CreateView):
     model = CustomUser
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('index')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['balance'] = 0
+        return context
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -206,6 +226,11 @@ class RegistrationPage(CreateView):
 class LoginPage(LoginView):
     form_class = CustomLoginForm
     template_name = 'app/login.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['balance'] = 0
+        return context
 
     def form_valid(self, form):
         user = form.get_user()
@@ -359,7 +384,6 @@ def update_profits(request):
             profit = (float(position.open_price) - current_price) / position.open_price * position.amount
 
         position.profit = profit
-        print(profit)
         position.save()
 
         if timezone.now() >= position.open_time + timezone.timedelta(seconds=position.duration):
@@ -394,8 +418,6 @@ def check_balance(request):
 
         amount = float(data.get('amount', 0))
         duration = int(data.get('duration', 0))
-        print(amount)
-        print(duration)
         if amount < 1:
             return JsonResponse({'balance_ok': False})
 
@@ -417,16 +439,39 @@ def check_demo_balance(request):
 
         amount = float(data.get('amount', 0))
         duration = int(data.get('duration', 0))
-        print(amount)
-        print(duration)
         if amount < 1:
             return JsonResponse({'balance_ok': False})
 
         user_account = request.user
         balance_ok = user_account.demo_balance >= amount
-        print(balance_ok)
-        print(user_account.demo_balance)
 
         return JsonResponse({'balance_ok': balance_ok})
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def update_demo_balance(request):
+    if request.method == 'POST':
+        user = request.user
+        print(user.demo_balance)
+        return JsonResponse({
+            'status': 'success',
+            'new_balance': float(user.demo_balance),
+            'new_profit': float(user.demo_profit),
+        })
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+def update_balance(request):
+    if request.method == 'POST':
+        user = request.user
+        print(user.balance)
+        return JsonResponse({
+            'status': 'success',
+            'new_balance': float(user.balance),
+            'new_profit': float(user.profit),
+        })
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+def error_404_view(request, exception):
+    return redirect('trade')

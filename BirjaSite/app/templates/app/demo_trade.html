@@ -22,37 +22,39 @@
 
 <div class="chart-container">
     <div class="trade-controls">
-        <div class="timer-menu">
-            <button id="timer-toggle">Select Time</button>
-            <div id="timer-settings" class="timer-settings hidden">
-                <div class="timer-settings-2">
-                    <div class="timer-control">
-                        <button id="hours-inc">+</button>
-                        <span id="hours">00</span>
-                        <button id="hours-dec">-</button>
-                    </div>
-                    <div class="timer-control">
-                        <button id="minutes-inc">+</button>
-                        <span id="minutes">00</span>
-                        <button id="minutes-dec">-</button>
-                    </div>
-                    <div class="timer-control">
-                        <button id="seconds-inc">+</button>
-                        <span id="seconds">00</span>
-                        <button id="seconds-dec">-</button>
+        
+            <div class="timer-menu">
+                <button id="timer-toggle">Select Time</button>
+                <div id="timer-settings" class="timer-settings hidden">
+                    <div class="timer-settings-2">
+                        <div class="timer-control">
+                            <button id="hours-inc">+</button>
+                            <span id="hours">00</span>
+                            <button id="hours-dec">-</button>
+                        </div>
+                        <div class="timer-control">
+                            <button id="minutes-inc">+</button>
+                            <span id="minutes">00</span>
+                            <button id="minutes-dec">-</button>
+                        </div>
+                        <div class="timer-control">
+                            <button id="seconds-inc">+</button>
+                            <span id="seconds">00</span>
+                            <button id="seconds-dec">-</button>
+                        </div>
                     </div>
                 </div>
+                <span id="timer-display">00:00:00</span>
             </div>
-            <span id="timer-display">00:00:00</span>
-        </div>
-        <div class="amount">
-            <input type="number" id="amount" value="1" min="0.01" step="0.01">
-            <span>Amount</span>
-        </div>
-        <div class="buttons">
-            <button class="higher" onclick="preparePosition('long')"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
-            <button class="lower" onclick="preparePosition('short')"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
-        </div>
+            <div class="amount">
+                <input type="number" id="amount" value="1" min="0.01" step="0.01">
+                <span>Amount</span>
+            </div>
+            <div class="buttons">
+                <button class="higher" onclick="preparePosition('long')"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
+                <button class="lower" onclick="preparePosition('short')"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
+            </div>
+
     </div>
 </div>
 
@@ -67,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const cryptoSelect = document.getElementById('cryptoSelect');
     const amountInput = document.getElementById('amount');
     const timerDisplay = document.getElementById('timer-display');
+    let is_one_pos = true;
 
     window.preparePosition = function(positionType) {
         const amount = parseFloat(amountInput.value);
@@ -82,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     function checkUserBalance(amount) {
-        const csrftoken = getCookie('csrftoken');
+        const csrftoken = getCookie('csrаftoken');
         return fetch('/check_demo_balance/', {
             method: 'POST',
             headers: {
@@ -100,6 +103,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function startTimer() {
+        if (is_one_pos !== true) {
+            alert('Position not open');
+            return
+        }
+        is_one_pos = false;
+        alert('Position opened successfully!');
+
         const hours = parseInt(document.getElementById('hours').textContent, 10);
         const minutes = parseInt(document.getElementById('minutes').textContent, 10);
         const seconds = parseInt(document.getElementById('seconds').textContent, 10);
@@ -109,6 +119,9 @@ document.addEventListener("DOMContentLoaded", function() {
         const timer = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(timer);
+                is_one_pos = true;
+                alert("Time is up");
+                fetchBalance();
                 return;
             }
 
@@ -142,10 +155,12 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => response.json())
         .then(data => {
+            
             if (data.status === 'success') {
                 console.log('Position opened successfully!');
             } else {
                 console.log('Error opening position: ' + data.message);
+                alert('Position not open')
             }
         })
         .catch(error => console.error('Error opening position:', error));
@@ -164,6 +179,29 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
         return cookieValue;
+    }
+
+    function fetchBalance() {
+        const csrftoken = getCookie('csrftoken');
+
+        fetch('/update_demo_balance/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('balance').textContent = data.new_balance.toString();
+
+            } else {
+                console.error('Error fetching balance:', data.message);
+                console.log(data.new_balance);
+            }
+        })
+        .catch(error => console.error('Error fetching balance:', error));
     }
 });
 </script>

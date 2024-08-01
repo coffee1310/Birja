@@ -250,6 +250,10 @@ section {
         width: 100%;
     }
 
+    .hero {
+        height: 80vh;
+    }
+
     .hero-text {
         max-width: 100%;
     }
@@ -272,8 +276,15 @@ section {
         margin-top: 100px;
         width: 30%;
         display: block;
-        max-width: 10px;
         height: auto;
+    }
+
+    .advantage-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        height: auto;
+        text-align: center;
     }
 
     .why-us h3 {
@@ -485,12 +496,13 @@ section {
 
 
 .body {
-    background: url(../img/bcg.jpeg) no-repeat;
+    background: url(../img/bcg.jpeg) no-repeat center center fixed;
+    background-size: cover;
 }
 
 .cryptoSelect {
-    margin-top: 100px;
-    margin-left: 150px;
+    top: 100px;
+    left: 150px;
     position: absolute;
     background-color: #249D92;
     color: #FFFFFF;
@@ -502,8 +514,8 @@ section {
 }
 
 #chartType {
-    margin-top: 100px;
-    margin-left: 350px;
+    top: 100px;
+    left: 350px;
     position: absolute;
     background-color: #249D92;
     color: #FFFFFF;
@@ -521,9 +533,6 @@ section {
     font-size: 20px;
 }
 
-.timeRangeButtons {
-    margin-left: 100px;
-}
 
 .timeRangeButtons button {
     color: white;
@@ -627,7 +636,7 @@ section {
 }
 
 .amount input {
-    width: 50px;
+    width: 150px;
     border: 0;
     background-color: #000000;
     color: white;
@@ -645,8 +654,8 @@ section {
 }
 
 .timeRangeButtons {
-    margin-top: 100px;
-    margin-left: 550px;
+    top: 100px;
+    left: 550px;
     position: absolute;
     background-color: #249D92;
     color: #FFFFFF;
@@ -658,6 +667,12 @@ section {
 }
 
 @media (max-width: 768px) {
+    .cryptoSelect {
+        left: 100px;
+        top: 100px;
+        width: 50px;
+    }
+
     .sidebar {
         width: 50px;
     }
@@ -704,21 +719,80 @@ section {
     .buttons strong {
         font-size: 1em;
     }
+
+    .amount input {
+        width: 100px;
+        border: 0;
+        background-color: #000000;
+        color: white;
+        font-size: 20px;
+        text-align: center;
+    }
 }
 
 @media (max-width: 480px) {
-    .sidebar {
-        width: 40px;
+    .chart-container {
+        width: 120px;
     }
+
+    .cryptoSelect {
+        font-size: 10px;
+        width: 50px;
+        left: 40px;
+    }
+
+    #chartType {
+        font-size: 10px;
+        width: 50px;
+        left: 100px;
+    }
+
+    #timeRangeButtons {
+        font-size: 10px;
+        width: 50px;
+        left: 170px;
+    }
+
+    .trade-controls .buttons button {
+        width: 80px;
+        font-size: 10px;
+    }
+
+    .trade-controls .buttons button strong {
+        font-size: 10px;
+    }
+
+    .trade-controls .buttons button img {
+        width: 30px;
+    }
+
+    .sidebar {
+        width: 50px;
+    }
+
+    .timer-menu {
+        font-size: 12px;
+    }
+
+    .timer-control span {
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .timer-control button {
+        font-size: 15px;
+        margin: 0;
+        width: 10px;
+    }
+
+    #amount {
+        width: 25px;
+    }
+    
 
     .graphic {
         margin-left: 40px;
-        width: calc(100% - 40px);
-    }
-
-    .cryptoSelect, #chartType {
-        margin-left: 5px;
-        width: 100px;
+        width: calc(100% - 160px);
     }
 
     .header .balance span {
@@ -732,6 +806,14 @@ section {
     .header .profile-icon img {
         width: 25px;
         height: 25px;
+    }
+
+    canvas {
+        width: 200px;
+    }
+
+    .close-sidebar {
+        margin: 0;
     }
 }
 
@@ -861,7 +943,7 @@ input[type="date"]::placeholder {
 
 @media (max-width: 576px) {
     .Registration form, .Login form {
-        width: 80%;
+        width: 60%;
     }
 
     .Registration h1, .Login h1 {
@@ -970,18 +1052,27 @@ tbody {
 }
 
 @media (max-width: 576px) {
+    .history h1 {
+        font-size: 20px;
+    }
     .filter-form {
         flex-direction: column; 
         align-items: center;
+        justify-content: center;
     }
 
-    .filter-form p, .filter-form select, .filter-form button {
-        margin: 10px 0; 
-        width: 100%; 
+    .filter-form select{
+        width: 100px;
+        margin: 20px;
     }
 
-    table th, table td {
-        white-space: normal;
+    tr, th, td {
+        font-size: 5px;
+        width: 5px;
+        border: 0;
+        padding-left: 0;
+        padding-right: 0;
+        white-space: pre-wrap;
     }
 }
 
@@ -993,7 +1084,7 @@ tbody {
     max-width: 900px;
     border-radius: 8px;
     background-color: #151515;
-    height: 100vh;
+    height: 100%;
     width: 50%;
 }
 
@@ -1063,6 +1154,17 @@ tbody {
 
 .profile-form button[type="submit"]:hover {
     background-color: #1f8376;
+}
+
+@media (max-width: 768px) {
+    .form-group label {
+        font-size: 10px;
+        width:60px;
+    }
+
+    .form-group input, .form-group span {
+        font-size: 10px;
+    }
 }
 
 /* deposit */
@@ -1434,9 +1536,9 @@ tbody {
     .hero-2 .hero-content {
         max-width: 50%;
     }
-
-    .hero-2-image {
-        max-width: 50%;
+    
+    .steps .step-content h3, .steps .step-content p{
+        font-size: 20px;
     }
 
     .step {
@@ -1470,6 +1572,10 @@ tbody {
 }
 
 @media (min-width: 768px) {
+    .steps .step-content h3{
+        font-size: 20px;
+    }
+
     .hero-2 {
         flex-direction: row;
         text-align: left;

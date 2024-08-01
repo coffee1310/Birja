@@ -51,7 +51,7 @@
             updateCount();
         }
 
-        const ctx = document.getElementById('cryptoChart').getContext('2d');
+    const ctx = document.getElementById('cryptoChart').getContext('2d');
     let chartType = 'line';
     let currentChart;
 
@@ -76,10 +76,17 @@
                 },
                 barPercentage: 1,
                 categoryPercentage: 1,
-                    
-            }]
+                barThickness: 'flex',
+                
+            }],
+            
+
         },
         options: {
+            animation: {
+                duration: 500,
+                transition: 0
+            },
             responsive: true,
             maintainAspectRatio: false,
             scales: {
@@ -99,7 +106,7 @@
                     ticks: {
                         color: 'white'
                     }
-                }
+                },
             },
             plugins: {
                 annotation: {
@@ -125,30 +132,25 @@
                         pinch: {
                             enabled: false
                         },
-                        mode: 'xy',
-                        onZoom: function({chart}) {
-                            const minYBoundary = Math.min(...chart.data.datasets[0].data);
-                            if (chart.options.scales.y.min < minYBoundary) {
-                                chart.options.scales.y.min = minYBoundary;
-                                chart.update();
-                            }
-                        }
-                    }
+                        mode: 'x',
+                        
+                    },
+                    zoomLevel: 0
                 }
             },
             elements: {
                 candlestick: {
                     barPercentage: 1.0,
                     categoryPercentage: 0.5,
-                    
+                    barThickness: 0.1,
                     // Настройка прозрачности свечей
                     borderColor: 'rgba(0, 0, 0, 1)',  // Измените этот цвет для границы свечей
                     borderWidth: 1,
                     // Настройка закругления свечей
-                    borderRadius: 5  // Значение радиуса для закругления углов
+                    borderRadius: 5,  // Значение радиуса для закругления углов
                     
                 }
-            }
+            },
         }
     };
     function createChart() {
@@ -178,114 +180,54 @@
             chart.update();
         }
 
+        let loadedData = [];
         // Обновленная функция для открытия позиции
-        async function openPosition(amount, duration, positionType) {
-            const selectedCrypto = document.getElementById('cryptoSelect').value;
-            const response = await fetch('/trade/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({
-                    crypto: selectedCrypto,
-                    amount: amount,
-                    duration: duration,
-                    positionType: positionType
-                })
-            });
+        
+        let interval;
 
-            if (response.ok) {
-                const result = await response.json();
-                const endTime = new Date(result.end_time).getTime();
-                addVerticalLine(bitcoinChart, endTime);
-                console.log('Position opened successfully:', result);
-            } else {
-                console.error('Error opening position:', await response.text());
-            }
-        }
-
-        document.querySelector('.higher').addEventListener('click', () => {
-            const amount = parseFloat(document.querySelector('input[name="amount"]').value);
-            const duration = calculateDuration();
-            openPosition(amount, duration, 'long');
-        });
-
-        document.querySelector('.lower').addEventListener('click', () => {
-            const amount = parseFloat(document.querySelector('input[name="amount"]').value);
-            const duration = calculateDuration();
-            openPosition(amount, duration, 'short');
-        });
-
-        // Пример функции для расчета продолжительности
-        function calculateDuration() {
-            const hours = parseInt(document.getElementById('hours').textContent, 10);
-            const minutes = parseInt(document.getElementById('minutes').textContent, 10);
-            const seconds = parseInt(document.getElementById('seconds').textContent, 10);
-            return (hours * 3600) + (minutes * 60) + seconds;
-        }
-
-        const apiKey = 'b2f300377672777aa258f397ac6c22f5c1fa12191e41ac68f82196aadf99478c';
-
-        async function fetchAndAddDataToChart(symbol, range, chartType) {
+        async function fetchAndAddDataToChart(symbol, range, chartType, startTime, append = false) {
             const apiKey = 'b2f300377672777aa258f397ac6c22f5c1fa12191e41ac68f82196aadf99478c';
             const currency = 'USD';
-            const now = Math.floor(Date.now() / 1000);
-            const dayInSeconds = 86400;
-            let fromTimestamp;
             let timeUnit;
             let url;
-            let interval; // Добавляем переменную для интервала
+            const screenWidth = window.innerWidth;
         
             switch (range) {
-                case '5y':
-                    fromTimestamp = now - (5 * 365 * dayInSeconds);
-                    timeUnit = 'month';
-                    interval = 7; // Отбираем данные с интервалом в 6 месяцев
-                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=2000&api_key=${apiKey}`;
-                    break;
-                case '1y':
-                    fromTimestamp = now - (365 * dayInSeconds);
-                    timeUnit = 'day';
-                    interval = 4; // Отбираем данные с интервалом в месяц
-                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=2000&api_key=${apiKey}`;
-                    break;
                 case '6m':
-                    fromTimestamp = now - (6 * 30 * dayInSeconds);
                     timeUnit = 'day';
-                    interval = 1; // Отбираем данные с интервалом в полмесяца
-                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=180&api_key=${apiKey}`;
+                    interval = screenWidth > 576 ? 7 : 25;
+                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&limit=210&api_key=${apiKey}`;
                     break;
                 case '1m':
-                    fromTimestamp = now - (30 * dayInSeconds);
-                    timeUnit = 'hour';
-                    interval = 1; // Отбираем данные с интервалом в день
-                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=30&api_key=${apiKey}`;
+                    timeUnit = 'day';
+                    interval = screenWidth > 576 ? 25 : 100;
+                    url = `https://min-api.cryptocompare.com/data/v2/histohour?fsym=${symbol}&tsym=${currency}&limit=840&api_key=${apiKey}`;
                     break;
                 case '1w':
-                    fromTimestamp = now - (7 * dayInSeconds);
-                    timeUnit = 'minutes';
-                    interval = 2; // Отбираем данные с интервалом в 12 часов
-                    url = `https://min-api.cryptocompare.com/data/v2/histohour?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=168&api_key=${apiKey}`;
+                    timeUnit = 'hour';
+                    interval = screenWidth > 576 ? 7 : 20;
+                    url = `https://min-api.cryptocompare.com/data/v2/histohour?fsym=${symbol}&tsym=${currency}&limit=192&api_key=${apiKey}`;
                     break;
                 case '1d':
-                    fromTimestamp = now - dayInSeconds;
-                    timeUnit = 'hour';
-                    interval = 1; // Отбираем данные с интервалом в час
-                    url = `https://min-api.cryptocompare.com/data/v2/histohour?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=24&api_key=${apiKey}`;
+                    timeUnit = 'minute';
+                    interval = screenWidth > 576 ? 10 : 45;
+                    url = `https://min-api.cryptocompare.com/data/v2/histominute?fsym=${symbol}&tsym=${currency}&limit=360&api_key=${apiKey}`;
                     break;
                 case '1h':
-                    fromTimestamp = now - 3600;
                     timeUnit = 'minute';
-                    interval = 1; // Отбираем данные с интервалом в минуту
-                    url = `https://min-api.cryptocompare.com/data/v2/histominute?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=60&api_key=${apiKey}`;
+                    interval = screenWidth > 576 ? 3 : 10;
+                    url = `https://min-api.cryptocompare.com/data/v2/histominute?fsym=${symbol}&tsym=${currency}&limit=75&api_key=${apiKey}`;
                     break;
                 default:
-                    fromTimestamp = now - (5 * 365 * dayInSeconds);
                     timeUnit = 'month';
-                    interval = 7; // Отбираем данные с интервалом в 6 месяцев
-                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&toTs=${now}&limit=2000&api_key=${apiKey}`;
+                    interval = 30;
+                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&limit=2000&api_key=${apiKey}`;
                     break;
+            }
+        
+            if (startTime && !isNaN(startTime)) {
+                const toTs = Math.floor(startTime / 1000);
+                url += `&toTs=${toTs}`;
             }
         
             try {
@@ -293,46 +235,57 @@
                 const data = await response.json();
                 console.log(data);
                 if (data.Response === "Success") {
-                    let filteredData = [];
-                    for (let i = 0; i < data.Data.Data.length; i += interval) {
-                        filteredData.push(data.Data.Data[i]);
+                    let newData = [];
+                    for (let i = data.Data.Data.length; i > 0; i -= interval) {
+                        const intervalData = data.Data.Data.slice(i, i + interval);
+                        
+                        if (intervalData.length > 0) {
+                            const endOfIntervalData = intervalData[intervalData.length - 1];
+                            if (intervalData.length === 1) {
+                                newData.push({
+                                    time: endOfIntervalData.time,
+                                    open: endOfIntervalData.open,
+                                    high: endOfIntervalData.high,
+                                    low: endOfIntervalData.low,
+                                    close: endOfIntervalData.close
+                                });
+                            } else {
+                                newData.push({
+                                    time: endOfIntervalData.time,
+                                    open: intervalData[0].open,
+                                    high: Math.max(...intervalData.map(point => point.high)),
+                                    low: Math.min(...intervalData.map(point => point.low)),
+                                    close: endOfIntervalData.close
+                                });
+                            }
+                        }
                     }
         
-                    if (chartType === 'line') {
-                        const prices = filteredData.map(point => ({
-                            t: new Date(point.time * 1000),
-                            y: point.close
-                        }));
-        
-                        chartConfig.data.labels = prices.map(point => point.t);
-                        chartConfig.data.datasets[0].data = prices.map(point => point.y);
-                    } else if (chartType === 'candlestick') {
-                        currentChart.data.datasets[0].backgroundColors   = {
-                            up: '#249D92',
-                            down: '#C95454',
-                            unchanged: '#999',
-                        };
-                        const prices = filteredData.map(point => ({
-                            t: new Date(point.time * 1000),
-                            o: point.open,
-                            h: point.high,
-                            l: point.low,
-                            c: point.close
-                        }));
-        
-                        chartConfig.data.labels = prices.map(point => point.t);
-                        chartConfig.data.datasets[0].data = prices.map(point => ({
-                            x: point.t,
-                            o: point.o,
-                            h: point.h,
-                            l: point.l,
-                            c: point.c
-                        }));
+                    newData = newData.reverse();
+                    console.log(newData);
+                    if (append) {
+                        // Добавляем новые данные в конец
+                        const uniqueTimes = new Set(loadedData.map(d => d.time));
+                        newData.forEach(d => {
+                            if (!uniqueTimes.has(d.time)) {
+                                loadedData.push(d);
+                                uniqueTimes.add(d.time);
+                            }
+                        });
+                    } else {
+                        // Добавляем новые данные в начало
+                        const uniqueTimes = new Set(loadedData.map(d => d.time));
+                        newData.forEach(d => {
+                            if (!uniqueTimes.has(d.time)) {
+                                loadedData.unshift(d);
+                                uniqueTimes.add(d.time);
+                            }
+                        });
                     }
         
-                    chartConfig.options.scales.x.time.unit = timeUnit;
-                    document.getElementById('cryptoChart').getContext('2d').canvas.focus();
-                    currentChart.update();
+                    loadedData = loadedData.sort((a, b) => a.time - b.time);
+        
+                    updateChart(chartType, timeUnit);
                 } else {
                     console.error('Ошибка при получении данных:', data.Message);
                 }
@@ -341,18 +294,83 @@
             }
         }
         
+        function clearChart() {
+            loadedData = [];
+            currentChart.data.labels = [];
+            currentChart.data.datasets[0].data = [];
+            currentChart.update('none');
+        }
 
+        function updateChart(chartType, timeUnit) {
+            const visibleData = loadedData.slice(loadedData.length - Math.ceil(loadedData.length * 0.9));
+        
+            if (chartType === 'line') {
+                const prices = visibleData.map(point => ({
+                    t: new Date(point.time * 1000),
+                    y: point.close
+                }));
+        
+                chartConfig.data.labels = prices.map(point => point.t);
+                chartConfig.data.datasets[0].data = prices.map(point => point.y);
+            } else if (chartType === 'candlestick') {
+                const prices = visibleData.map(point => ({
+                    t: new Date(point.time * 1000),
+                    o: point.open,
+                    h: point.high,
+                    l: point.low,
+                    c: point.close
+                }));
+        
+                chartConfig.data.labels = prices.map(point => point.t);
+                chartConfig.data.datasets[0].data = prices.map(point => ({
+                    x: point.t,
+                    o: point.o,
+                    h: point.h,
+                    l: point.l,
+                    c: point.c
+                }));
+            }
+        
+            chartConfig.options.scales.x.time.unit = timeUnit;
+        
+            const maxTime = Math.max(...chartConfig.data.labels.map(date => date.getTime()));
+            const minTime = Math.min(...chartConfig.data.labels.map(date => date.getTime()));
+            const midPoint = maxTime + (maxTime - minTime) / 2;
+        
+            currentChart.options.scales.x.min = minTime;
+            currentChart.options.scales.x.max = midPoint;
+        
+            const screenWidth = window.innerWidth;
+            if (screenWidth > 576) {
+                currentChart.options.elements.candlestick = {
+                    barThickness: 'flex',
+                    categoryPercentage: 1.0,
+                    barPercentage: 0.1,
+                };
+            } else {
+                currentChart.options.elements.candlestick = {
+                    barThickness: 0.2,
+                    categoryPercentage: 0.1,
+                    barPercentage: 0.1,
+                };
+            }
+        
+            currentChart.update();
+        }
+        
         const cryptoSelect = document.getElementById('cryptoSelect');
         const timeRangeButtons = document.getElementById('timeRangeButtons');
         let currentRange = '1h';
 
         cryptoSelect.addEventListener('change', () => {
+            clearChart();
             fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
         });
     
         timeRangeButtons.addEventListener('change', (event) => {
             const selectedRange = event.target.value;
             currentRange = selectedRange;
+            clearChart();
             fetchAndAddDataToChart(cryptoSelect.value, selectedRange, chartType);
         });
 
@@ -364,58 +382,68 @@
             chartConfig.data.datasets[0].borderColor = chartType === 'line' ? 'rgba(75, 192, 192, 1)' : undefined;
             chartConfig.data.datasets[0].borderWidth = chartType === 'line' ? 1 : undefined;
             chartConfig.data.datasets[0].fill = chartType === 'line';
+            clearChart();
             createChart();
+            updateChart();
             fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
         });
 
-        fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
-        setInterval(() => fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType), 3000);
-
-        let isDragging = false;
-        let startX = 0;
-        let startY = 0;
-        let initialMinX = null;
-        let initialMaxX = null;
-        let initialMinY = null;
-        let initialMaxY = null;
-
-        document.getElementById('cryptoChart').addEventListener('mousedown', (event) => {
-            isDragging = true;
-            startX = event.clientX;
-            startY = event.clientY;
-            initialMinX = currentChart.options.scales.x.min;
-            initialMaxX = currentChart.options.scales.x.max;
-            initialMinY = currentChart.options.scales.y.min;
-            initialMaxY = currentChart.options.scales.y.max;
-        });
+        document.getElementById('cryptoChart').addEventListener('wheel', async (event) => {
+            event.preventDefault();
+            const deltaY = event.deltaY;
         
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
+            const minDataPoints = 10; // Минимальное количество данных на графике
+            const maxDataPoints = 100; // Максимальное количество данных на графике
         
-        document.addEventListener('mousemove', (event) => {
-            if (isDragging) {
-                const deltaX = event.clientX - startX;
-                const deltaY = event.clientY - startY;
-
-                const minXBoundary = currentChart.data.labels[0].getTime();
-                const maxXBoundary = currentChart.data.labels[currentChart.data.labels.length - 1].getTime();
-                const minYBoundary = Math.min(...currentChart.data.datasets[0].data);
-
-                const newMinX = Math.max(minXBoundary, initialMinX + deltaX * (initialMaxX - initialMinX) / 1000);
-                const newMaxX = Math.min(maxXBoundary, initialMaxX + deltaX * (initialMaxX - initialMinX) / 1000);
-
-                currentChart.options.scales.x.min = newMinX;
-                currentChart.options.scales.x.max = newMaxX;
-
-                const newMinY = Math.max(minYBoundary, initialMinY - deltaY * (initialMaxY - initialMinY) / 1000);
-                const newMaxY = initialMaxY - deltaY * (initialMaxY - initialMinY) / 1000;
-
-                currentChart.options.scales.y.min = newMinY;
-                currentChart.options.scales.y.max = newMaxY;
-
-                currentChart.update();
+            if (deltaY > 0) { // Scroll down to load more data
+                if (loadedData.length < maxDataPoints) {
+                    const startTime = loadedData.length ? loadedData[0].time * 1000 : undefined;
+                    if (chartType == "candlestick") {
+                        currentChart.options.elements.candlestick = {
+                            barThickness: 0.1,
+                        };
+                    }
+                    await fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType, startTime);
+                }
+            } else { // Scroll up to remove data
+                if (loadedData.length > minDataPoints) {
+                    if (chartType == "candlestick") {
+                        currentChart.options.elements.candlestick = {
+                            barThickness: 0.1,
+                            categoryPercentage: 1.0,
+                            barPercentage: 0.1,
+                        };
+                    }
+                    loadedData = loadedData.slice(Math.floor(loadedData.length / 2));
+                    updateChart(chartType, currentChart.options.scales.x.time.unit);
+                }
             }
+        
+            // Обновляем min и max для изменения масштаба по оси X
+            const firstTime = loadedData[0].time * 1000;
+            const rangeChange = (firstTime - currentChart.options.scales.x.min) * 0.1 * (deltaY > 0 ? 1 : -1);
+            
+            // Ограничения на масштабирование по оси X
+            const minScaleRange = 1000 * 60 * 60 * 24; // Минимальный масштаб: 1 день
+            const maxScaleRange = 1000 * 60 * 60 * 24 * 30; // Максимальный масштаб: 30 дней
+        
+            if ((currentChart.options.scales.x.max - rangeChange) - (currentChart.options.scales.x.min + rangeChange) >= minScaleRange &&
+                (currentChart.options.scales.x.max - rangeChange) - (currentChart.options.scales.x.min + rangeChange) <= maxScaleRange) {
+                
+                currentChart.options.scales.x.min += rangeChange;
+                currentChart.options.scales.x.max -= rangeChange;
+            }
+        
+            currentChart.update();
+            document.getElementById("cryptoChart").focus();
         });
         
+        async function fetchAndAppendDataToChart(symbol, range, chartType) {
+            const endTime = loadedData.length ? loadedData[loadedData.length - 1].time * 1000 : undefined;
+            console.log("endTime (before fetch):", endTime); // Debugging log
+            await fetchAndAddDataToChart(symbol, range, chartType, Date.now(), true);
+        }
+
+        fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
+        setInterval(() => fetchAndAppendDataToChart(cryptoSelect.value, currentRange, chartType), 6000);
     });
