@@ -494,6 +494,28 @@ section {
     z-index: -5;
 }
 
+#highlightCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+#profitMenu {
+    display: none;
+    position: fixed;
+    justify-content: center;
+    top: -100px; /* Начальная позиция за пределами экрана */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f8f9fa;
+    padding: 10px 20px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: top 0.5s ease, display 0.5s;
+}
 
 .body {
     background: url(../img/bcg.jpeg) no-repeat center center fixed;
@@ -568,6 +590,27 @@ section {
 .timeRangeButtons button span {
     position: relative;
     z-index: 5;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+input[type=number] {
+    -moz-appearance: textfield; /* Убираем стрелочки в Firefox */
+}
+
+.timer-control input {
+    position: relative;
+    z-index: 5;
+    width: 30px;
+    background-color: transparent;
+    color: white;
+    border: 0;
+    font-size: 20px;
+    text-align: center;
 }   
 
 .timer-settings-2 {
@@ -727,6 +770,28 @@ section {
         color: white;
         font-size: 20px;
         text-align: center;
+    }
+
+    #profitMenu {
+        display: none;
+        width: 100px;
+        position: fixed;
+        justify-content: center;
+        top: -100px; /* Начальная позиция за пределами экрана */
+        left: 20%;
+        font-size: 10px;
+        transform: translateX(-50%);
+        background-color: #f8f9fa;
+        padding: 10px 20px;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        transition: top 0.5s ease, display 0.5s;
+        font-size: 10px;
+    }
+
+    #profitMenu strong {
+        font-size: 10px;
     }
 }
 

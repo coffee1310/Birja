@@ -153,7 +153,8 @@ class demoTradePage(LoginRequiredMixin, TemplateView):
                 position_type=position_type,
                 amount=amount,
                 open_price=current_price,
-                duration=duration
+                duration=duration,
+                demo=True
             )
 
             threading.Thread(target=self.process_position, args=(position.id,)).start()
@@ -170,8 +171,8 @@ class demoTradePage(LoginRequiredMixin, TemplateView):
 
     def process_position(self, position_id):
         position = Position.objects.get(id=position_id)
-
         user = position.user
+
         if user.demo_balance < position.amount:
             position.delete()
             return 0
@@ -193,8 +194,9 @@ class demoTradePage(LoginRequiredMixin, TemplateView):
             else:
                 profit = -Decimal(position.amount)
 
-        position.demo_profit = profit
+        position.profit = profit
         position.closed = True
+        print(position.profit)
         position.save()
 
         user.demo_balance += Decimal(profit) + position.amount if profit > 0 else 0
@@ -452,7 +454,6 @@ def check_demo_balance(request):
 def update_demo_balance(request):
     if request.method == 'POST':
         user = request.user
-        print(user.demo_balance)
         return JsonResponse({
             'status': 'success',
             'new_balance': float(user.demo_balance),
@@ -464,7 +465,6 @@ def update_demo_balance(request):
 def update_balance(request):
     if request.method == 'POST':
         user = request.user
-        print(user.balance)
         return JsonResponse({
             'status': 'success',
             'new_balance': float(user.balance),
@@ -475,3 +475,21 @@ def update_balance(request):
 
 def error_404_view(request, exception):
     return redirect('trade')
+
+def get_latest_demo_profit(request):
+    latest_profit = Position.objects.filter(user=request.user, demo=True)
+    latest_profit = latest_profit.latest('id')
+    data = {
+        'profit': latest_profit.profit,
+        'date': latest_profit.open_time
+    }
+    return JsonResponse(data)
+
+def get_latest_profit(request):
+    latest_profit = Position.objects.filter(user=request.user, demo=False)
+    latest_profit = latest_profit.latest('id')
+    data = {
+        'profit': latest_profit.profit,
+        'date': latest_profit.open_time
+    }
+    return JsonResponse(data)

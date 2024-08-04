@@ -33,7 +33,7 @@ class CryptoCurrencyAdmin(admin.ModelAdmin):
 admin.site.register(CryptoCurrency, CryptoCurrencyAdmin)
 
 class PositionAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "crypto", "position_type", "amount", "open_price", "open_time", "duration", "closed", "profit")
+    list_display = ("id", "user", "crypto", "position_type", "amount", "open_price", "open_time", "duration", "closed", "demo", "profit")
     list_display_links = ("crypto", "position_type", "user", "amount")
     search_fields = ("crypto", "user")
 

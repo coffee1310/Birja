@@ -20,39 +20,40 @@
     <option value="1h">1 hour</option>
 </select>
 
+<div id="profitMenu"></div>
+
 <div class="chart-container">
-    <div class="trade-controls">
-        
+    <div class="trade-controls">  
             <div class="timer-menu">
-                <button id="timer-toggle">Select Time</button>
-                <div id="timer-settings" class="timer-settings hidden">
-                    <div class="timer-settings-2">
-                        <div class="timer-control">
-                            <button id="hours-inc">+</button>
-                            <span id="hours">00</span>
-                            <button id="hours-dec">-</button>
-                        </div>
-                        <div class="timer-control">
-                            <button id="minutes-inc">+</button>
-                            <span id="minutes">00</span>
-                            <button id="minutes-dec">-</button>
-                        </div>
-                        <div class="timer-control">
-                            <button id="seconds-inc">+</button>
-                            <span id="seconds">00</span>
-                            <button id="seconds-dec">-</button>
-                        </div>
+            <button id="timer-toggle">Select Time</button>
+            <div id="timer-settings" class="timer-settings hidden">
+                <div class="timer-settings-2">
+                    <div class="timer-control">
+                        <button id="hours-inc">+</button>
+                        <input type="number" id="hours" value="00" min="0" max="23">
+                        <button id="hours-dec">-</button>
+                    </div>
+                    <div class="timer-control">
+                        <button id="minutes-inc">+</button>
+                        <input type="number" id="minutes" value="00" min="0">
+                        <button id="minutes-dec">-</button>
+                    </div>
+                    <div class="timer-control">
+                        <button id="seconds-inc">+</button>
+                        <input type="number" id="seconds" value="00" min="0">
+                        <button id="seconds-dec">-</button>
                     </div>
                 </div>
-                <span id="timer-display">00:00:00</span>
             </div>
+            <span id="timer-display">00:00:00</span>
+        </div>
             <div class="amount">
                 <input type="number" id="amount" value="1" min="0.01" step="0.01">
                 <span>Amount</span>
             </div>
             <div class="buttons">
-                <button class="higher" onclick="preparePosition('long')"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
-                <button class="lower" onclick="preparePosition('short')"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
+                <button class="higher" onclick="preparePosition('long')" id="longButton"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
+                <button class="lower" onclick="preparePosition('short')" id="shortButton"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
             </div>
 
     </div>
@@ -60,10 +61,12 @@
 
 <div class="graphic">
     <canvas id="cryptoChart"></canvas>
+    <canvas id="highlightCanvas" style="position:absolute; top:100; left:30px; pointer-events:none;"></canvas>
 </div>
 
 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/js/timer.js' %}"></script>
+
 <script type="text/javascript">
 document.addEventListener("DOMContentLoaded", function() {
     const cryptoSelect = document.getElementById('cryptoSelect');
@@ -108,20 +111,21 @@ document.addEventListener("DOMContentLoaded", function() {
             return
         }
         is_one_pos = false;
-        alert('Position opened successfully!');
+        alert('Position opened successfully!', hideProfitMenu());
 
-        const hours = parseInt(document.getElementById('hours').textContent, 10);
-        const minutes = parseInt(document.getElementById('minutes').textContent, 10);
-        const seconds = parseInt(document.getElementById('seconds').textContent, 10);
+        const hours = parseInt(document.getElementById('hours').value, 10);
+        const minutes = parseInt(document.getElementById('minutes').value, 10);
+        const seconds = parseInt(document.getElementById('seconds').value, 10);
         const totalTime = (hours * 3600) + (minutes * 60) + seconds;
 
         let timeLeft = totalTime;
         const timer = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(timer);
+                timerDisplay.textContent = `${document.getElementById('hours').value.padStart(2, '0')}:${document.getElementById('minutes').value.padStart(2, '0')}:${document.getElementById('seconds').value.padStart(2, '0')}`;
                 is_one_pos = true;
-                alert("Time is up");
                 fetchBalance();
+                updateProfitMenu();
                 return;
             }
 
@@ -194,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                document.getElementById('balance').textContent = data.new_balance.toString();
+                document.getElementById('balance').textContent = data.new_balance.toString() + '$';
 
             } else {
                 console.error('Error fetching balance:', data.message);
@@ -202,6 +206,40 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         })
         .catch(error => console.error('Error fetching balance:', error));
+    }
+
+    async function fetchLatestProfit() {
+        try {
+            const response = await fetch('/latest-demo-profit/');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error fetching latest profit:", error);
+        }
+    }
+
+    function showProfitMenu(profit, date) {
+        const profitMenu = document.getElementById('profitMenu');
+        profitMenu.innerHTML = `<strong>Latest Profit:</strong> $${profit} on ${new Date(date).toLocaleString()}`;
+        profitMenu.style.display = 'flex';
+        setTimeout(() => {
+            profitMenu.style.top = '10px';
+        }, 10);
+    }
+
+    async function updateProfitMenu() {
+        const latestProfitData = await fetchLatestProfit();
+        if (latestProfitData) {
+            showProfitMenu(latestProfitData.profit, latestProfitData.date);
+        }
+    }
+
+    function hideProfitMenu() {
+        const profitMenu = document.getElementById('profitMenu');
+        profitMenu.style.top = '-100px';
+        setTimeout(() => {
+            profitMenu.style.display = 'none';
+        }, 500); // Time must match the transition duration in CSS
     }
 });
 </script>

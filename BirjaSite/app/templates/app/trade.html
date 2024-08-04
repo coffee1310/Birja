@@ -28,17 +28,17 @@
                 <div class="timer-settings-2">
                     <div class="timer-control">
                         <button id="hours-inc">+</button>
-                        <span id="hours">00</span>
+                        <input type="number" id="hours" value="00" min="0" max="23">
                         <button id="hours-dec">-</button>
                     </div>
                     <div class="timer-control">
                         <button id="minutes-inc">+</button>
-                        <span id="minutes">00</span>
+                        <input type="number" id="minutes" value="00" min="0">
                         <button id="minutes-dec">-</button>
                     </div>
                     <div class="timer-control">
                         <button id="seconds-inc">+</button>
-                        <span id="seconds">00</span>
+                        <input type="number" id="seconds" value="00" min="0">
                         <button id="seconds-dec">-</button>
                     </div>
                 </div>
@@ -50,14 +50,15 @@
             <span>Amount</span>
         </div>
         <div class="buttons">
-            <button class="higher" onclick="preparePosition('long')"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
-            <button class="lower" onclick="preparePosition('short')"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
+            <button class="higher" onclick="preparePosition('long')" id="longButton"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
+            <button class="lower" onclick="preparePosition('short')" id="shortButton"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
         </div>
     </div>
 </div>
 
 <div class="graphic">
     <canvas id="cryptoChart"></canvas>
+    <canvas id="highlightCanvas" style="position:absolute; top:100; left:30px; pointer-events:none;"></canvas>
 </div>
 
 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
@@ -107,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return
         }
         is_one_pos = false;
-        alert('Position opened successfully!');
+        alert('Position opened successfully!', hideProfitMenu());
 
         const hours = parseInt(document.getElementById('hours').textContent, 10);
         const minutes = parseInt(document.getElementById('minutes').textContent, 10);
@@ -118,9 +119,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const timer = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(timer);
+                timerDisplay.textContent = `${document.getElementById('hours').value.padStart(2, '0')}:${document.getElementById('minutes').value.padStart(2, '0')}:${document.getElementById('seconds').value.padStart(2, '0')}`;
                 is_one_pos = true;
-                alert("Time is up");
                 fetchBalance();
+                updateProfitMenu();
                 return;
             }
 
@@ -201,6 +203,40 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         })
         .catch(error => console.error('Error fetching balance:', error));
+    }
+
+    async function fetchLatestProfit() {
+        try {
+            const response = await fetch('/latest-profit/');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error fetching latest profit:", error);
+        }
+    }
+
+    function showProfitMenu(profit, date) {
+        const profitMenu = document.getElementById('profitMenu');
+        profitMenu.innerHTML = `<strong>Latest Profit:</strong> $${profit} on ${new Date(date).toLocaleString()}`;
+        profitMenu.style.display = 'flex';
+        setTimeout(() => {
+            profitMenu.style.top = '10px';
+        }, 10);
+    }
+
+    async function updateProfitMenu() {
+        const latestProfitData = await fetchLatestProfit();
+        if (latestProfitData) {
+            showProfitMenu(latestProfitData.profit, latestProfitData.date);
+        }
+    }
+
+    function hideProfitMenu() {
+        const profitMenu = document.getElementById('profitMenu');
+        profitMenu.style.top = '-100px';
+        setTimeout(() => {
+            profitMenu.style.display = 'none';
+        }, 500); // Time must match the transition duration in CSS
     }
 });
 </script>

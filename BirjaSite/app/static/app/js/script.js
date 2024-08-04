@@ -84,9 +84,10 @@
         },
         options: {
             animation: {
-                duration: 500,
-                transition: 0
+                duration: 100,
+                
             },
+            transitions: 'hide',
             responsive: true,
             maintainAspectRatio: false,
             scales: {
@@ -110,9 +111,7 @@
             },
             plugins: {
                 annotation: {
-                    annotations: {
-                        backgroundColor: 'white'
-                    }
+                    annotations: []
                 },
                 legend: {
                     display: false // Эта строка убирает подпись (легенду) над графиком
@@ -163,32 +162,15 @@
     createChart();
     const chartTypeSelect = document.getElementById('chartType');
 
-        // Функция для добавления вертикальной линии
-        function addVerticalLine(chart, timestamp) {
-            chart.options.plugins.annotation.annotations.endLine = {
-                type: 'line',
-                xMin: timestamp,
-                xMax: timestamp,
-                borderColor: 'red',
-                borderWidth: 2,
-                label: {
-                    content: 'End Time',
-                    enabled: true,
-                    position: 'top'
-                }
-            };
-            chart.update();
-        }
-
         let loadedData = [];
         // Обновленная функция для открытия позиции
         
         let interval;
+        const apiKey = 'b2f300377672777aa258f397ac6c22f5c1fa12191e41ac68f82196aadf99478c';
+        let timeUnit;
 
         async function fetchAndAddDataToChart(symbol, range, chartType, startTime, append = false) {
-            const apiKey = 'b2f300377672777aa258f397ac6c22f5c1fa12191e41ac68f82196aadf99478c';
             const currency = 'USD';
-            let timeUnit;
             let url;
             const screenWidth = window.innerWidth;
         
@@ -262,7 +244,6 @@
                     }
         
                     newData = newData.reverse();
-                    console.log(newData);
                     if (append) {
                         // Добавляем новые данные в конец
                         const uniqueTimes = new Set(loadedData.map(d => d.time));
@@ -284,8 +265,9 @@
                     }
         
                     loadedData = loadedData.sort((a, b) => a.time - b.time);
-        
+                    
                     updateChart(chartType, timeUnit);
+                    
                 } else {
                     console.error('Ошибка при получении данных:', data.Message);
                 }
@@ -294,6 +276,94 @@
             }
         }
         
+        function convertIntervalToMilliseconds(interval, unit) {
+            switch (unit) {
+                case 'day':
+                    return interval * 24 * 60 * 60 * 1000;
+                case 'hour':
+                    return interval * 60 * 60 * 1000;
+                case 'minute':
+                    return interval * 60 * 1000;
+                default:
+                    throw new Error('Unsupported interval unit');
+            }
+        }
+
+        async function updatePriceData() {
+            const crypto = cryptoSelect.value;
+            try {
+                const apiEndpoint = 'https://min-api.cryptocompare.com/data/price?fsym=';
+                const response = await fetch(`${apiEndpoint}${crypto}&tsyms=USD&api_key=${apiKey}`);
+                const data = await response.json();
+                const currentPrice = data.USD;
+                const currentTime = data.time; // Время в секундах
+        
+                // Если есть загруженные данные
+                if (loadedData.length > 0) {
+                    const lastDataPoint = loadedData[loadedData.length - 1];
+                    const timeDifference = (currentTime - lastDataPoint.time) * 1000;
+                    const intervalMilliseconds = convertIntervalToMilliseconds(interval, timeUnit);
+
+                    if (timeDifference >= intervalMilliseconds) {
+                        // Добавить новую точку данных
+                        const newDataPoint = {
+                            x: new Date(currentTime * 1000),
+                            o: currentPrice,
+                            h: currentPrice,
+                            l: currentPrice,
+                            c: currentPrice
+                        };
+                        loadedData.push(newDataPoint);
+        
+                        // Добавляем новую точку в график
+                        if (chartType == 'candlestick') {
+                            currentChart.data.datasets[0].data.push(newDataPoint);
+                        } else {
+                            currentChart.data.datasets[0].data.push(newDataPoint.close);
+                        }
+                    } else {
+                        // Обновить последнюю точку данных
+                        const index = currentChart.data.datasets[0].data.length - 1;
+                        const lastDataPoint2 = currentChart.data.datasets[0].data[index];
+                        lastDataPoint2.c = currentPrice;
+                        lastDataPoint2.h = Math.max(lastDataPoint.high, currentPrice);
+                        lastDataPoint2.l = Math.min(lastDataPoint.low, currentPrice);
+
+                        lastDataPoint.close = currentPrice;
+                        lastDataPoint.high = Math.max(lastDataPoint.high, currentPrice);
+                        lastDataPoint.low = Math.min(lastDataPoint.low, currentPrice);
+                        // Обновляем последнюю точку в графике
+                        if (chartType == 'candlestick') {
+                             currentChart.data.datasets[0].data[index] = lastDataPoint2;
+                             
+                        } else {
+                            currentChart.data.datasets[0].data[index] = lastDataPoint.close;
+                        }
+                    }
+                } else {
+                    // Если данных еще нет, добавить первую точку данных
+                    const newDataPoint = {
+                        x: new Date(currentTime * 1000),
+                        o: currentPrice,
+                        h: currentPrice,
+                        l: currentPrice,
+                        c: currentPrice
+                    };
+                    loadedData.push(newDataPoint);
+        
+                    // Добавляем первую точку в график
+                    currentChart.data.datasets[0].data.push(newDataPoint);
+                }
+        
+                // Обновление графика после добавления или изменения данных
+                currentChart.update();
+                
+        
+            } catch (error) {
+                console.error("Error fetching current price:", error);
+            }
+        }
+
         function clearChart() {
             loadedData = [];
             currentChart.data.labels = [];
@@ -439,11 +509,133 @@
         });
         
         async function fetchAndAppendDataToChart(symbol, range, chartType) {
+            
             const endTime = loadedData.length ? loadedData[loadedData.length - 1].time * 1000 : undefined;
-            console.log("endTime (before fetch):", endTime); // Debugging log
-            await fetchAndAddDataToChart(symbol, range, chartType, Date.now(), true);
+            await updatePriceData();
         }
 
         fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
+        
         setInterval(() => fetchAndAppendDataToChart(cryptoSelect.value, currentRange, chartType), 6000);
+
+        const longButton = document.getElementById('longButton');
+        const shortButton = document.getElementById('shortButton');
+        const canvas = document.getElementById('highlightCanvas');
+        const ctx2 = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvasChart = new Chart(ctx2);
+            canvas.width = chartCanvas.width;
+            canvas.height = chartCanvas.height;
+            canvas.style.width = chartCanvas.style.width;
+            canvas.style.height = chartCanvas.style.height;
+            canvasChart.xMax = currentChart.xMax;
+            canvasChart.yMax = currentChart.yMax;
+            canvasChart.xMin = currentChart.xMin;
+            canvasChart.yMin = currentChart.xMin;
+        }
+    
+        function getYCoordinateForPrice(price) {
+            const yScale = currentChart.scales['y'];
+            if (!yScale) {
+                console.error('Y scale not found');
+                return 0;
+            }
+            return yScale.getPixelForValue(price);
+        }
+    
+        function getCurrentPrice() {
+            // Assuming the latest price is the last data point
+            const latestDataPoint = loadedData[loadedData.length - 1];
+            return latestDataPoint ? latestDataPoint.close : 0;
+        }
+    
+        function highlightLong() {
+            const currentPrice = getCurrentPrice();
+            const y = getYCoordinateForPrice(currentPrice);
+            ctx2.clearRect(0, 0, canvas.width, canvas.height);
+            ctx2.fillStyle = 'rgba(0, 158, 37, 0.2)';
+            ctx2.fillRect(0, 0, canvas.width, y);
+        }
+    
+        function highlightShort() {
+            const currentPrice = getCurrentPrice();
+            const y = getYCoordinateForPrice(currentPrice);
+            ctx2.clearRect(0, 0, canvas.width, canvas.height);
+            ctx2.fillStyle = 'rgba(255, 0, 0, 0.2)';
+            ctx2.fillRect(0, y, canvas.width, canvas.height - y - 200);
+        }
+    
+        function clearHighlight() {
+            ctx2.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    
+        longButton.addEventListener('mouseenter', highlightLong);
+        longButton.addEventListener('mouseleave', clearHighlight);
+        shortButton.addEventListener('mouseenter', highlightShort);
+        shortButton.addEventListener('mouseleave', clearHighlight);
+        longButton.addEventListener('click', () => addHorizontalLine('long'));
+        shortButton.addEventListener('click', () => addHorizontalLine('short'));
+        
+        window.addEventListener('resize', resizeCanvas);
+        currentChart.update();
+        resizeCanvas();
+        function addHorizontalLine(type) {
+            
+            const currentPrice = loadedData[loadedData.length - 1].close; // Текущая цена из последних данных
+            const color = type === 'long' ? 'green' : 'red';
+            const annotation = {
+                type: 'line',
+                mode: 'horizontal',
+                scaleID: 'y',
+                value: currentPrice,
+                borderColor: color,
+                borderWidth: 2,
+                label: {
+                    enabled: true,
+                    content: `${type.toUpperCase()} @ ${currentPrice}`,
+                }
+            };
+            if (!currentChart.options.plugins.annotation) {
+                currentChart.options.plugins.annotation = {
+                    annotations: []
+                };
+            }
+        
+            // Добавление новой аннотации
+            if (currentChart.options.plugins.annotation.annotations.length === 0) {
+                currentChart.options.plugins.annotation.annotations.push(annotation);
+                startTimer();
+                hideProfitMenu();
+            }
+        
+            // Обновление графика
+            currentChart.update();
+        }
+
+        function startTimer() {
+            const hours = parseInt(document.getElementById('hours').value, 10);
+            const minutes = parseInt(document.getElementById('minutes').value, 10);
+            const seconds = parseInt(document.getElementById('seconds').value, 10);
+            const totalTime = (hours * 3600) + (minutes * 60) + seconds;
+    
+            let timeLeft = totalTime;
+            const timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    currentChart.options.plugins.annotation.annotations = [];
+                    return;
+                }
+    
+                timeLeft--;
+            }, 1000);
+        }
+
+        function hideProfitMenu() {
+            const profitMenu = document.getElementById('profitMenu');
+            profitMenu.style.top = '-100px';
+            setTimeout(() => {
+                profitMenu.style.display = 'none';
+            }, 500); // Time must match the transition duration in CSS
+        }
     });

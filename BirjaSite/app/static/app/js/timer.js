@@ -8,51 +8,61 @@ document.addEventListener("DOMContentLoaded", function() {
     const minutesDec = document.getElementById('minutes-dec');
     const secondsInc = document.getElementById('seconds-inc');
     const secondsDec = document.getElementById('seconds-dec');
+    const hoursInput = document.getElementById('hours');
+    const minutesInput = document.getElementById('minutes');
+    const secondsInput = document.getElementById('seconds');
 
     timerToggle.addEventListener('click', () => {
         timerSettings.classList.toggle('hidden');
     });
 
     function updateDisplay() {
-        const hours = document.getElementById('hours').textContent;
-        const minutes = document.getElementById('minutes').textContent;
-        const seconds = document.getElementById('seconds').textContent;
+        const hours = hoursInput.value.padStart(2, '0');
+        const minutes = minutesInput.value.padStart(2, '0');
+        const seconds = secondsInput.value.padStart(2, '0');
         timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
     }
 
-    hoursInc.addEventListener('click', () => {
-        const hours = document.getElementById('hours');
-        hours.textContent = (parseInt(hours.textContent, 10) + 1).toString().padStart(2, '0');
+    function increment(input, max) {
+        input.value = Math.min(parseInt(input.value, 10) + 1, max).toString().padStart(2, '0');
         updateDisplay();
-    });
+    }
 
-    hoursDec.addEventListener('click', () => {
-        const hours = document.getElementById('hours');
-        hours.textContent = (Math.max(parseInt(hours.textContent, 10) - 1, 0)).toString().padStart(2, '0');
+    function decrement(input, min) {
+        input.value = Math.max(parseInt(input.value, 10) - 1, min).toString().padStart(2, '0');
         updateDisplay();
-    });
+    }
 
-    minutesInc.addEventListener('click', () => {
-        const minutes = document.getElementById('minutes');
-        minutes.textContent = (parseInt(minutes.textContent, 10) + 1).toString().padStart(2, '0');
+    function validateInput(input, min, max) {
+        if (input.value === '') {
+            input.value = min.toString().padStart(2, '0');
+        } else if (parseInt(input.value, 10) < min) {
+            input.value = min.toString().padStart(2, '0');
+        } else if (parseInt(input.value, 10) > max) {
+            input.value = max.toString().padStart(2, '0');
+        }
         updateDisplay();
-    });
+    }
 
-    minutesDec.addEventListener('click', () => {
-        const minutes = document.getElementById('minutes');
-        minutes.textContent = (Math.max(parseInt(minutes.textContent, 10) - 1, 0)).toString().padStart(2, '0');
-        updateDisplay();
-    });
+    hoursInc.addEventListener('click', () => increment(hoursInput, 23));
+    hoursDec.addEventListener('click', () => decrement(hoursInput, 0));
+    minutesInc.addEventListener('click', () => increment(minutesInput, 59));
+    minutesDec.addEventListener('click', () => decrement(minutesInput, 0));
+    secondsInc.addEventListener('click', () => increment(secondsInput, 59));
+    secondsDec.addEventListener('click', () => decrement(secondsInput, 0));
 
-    secondsInc.addEventListener('click', () => {
-        const seconds = document.getElementById('seconds');
-        seconds.textContent = (parseInt(seconds.textContent, 10) + 1).toString().padStart(2, '0');
-        updateDisplay();
-    });
+    hoursInput.addEventListener('input', () => validateInput(hoursInput, 0, 23));
+    minutesInput.addEventListener('input', () => validateInput(minutesInput, 0, 59));
+    secondsInput.addEventListener('input', () => validateInput(secondsInput, 0, 59));
 
-    secondsDec.addEventListener('click', () => {
-        const seconds = document.getElementById('seconds');
-        seconds.textContent = (Math.max(parseInt(seconds.textContent, 10) - 1, 0)).toString().padStart(2, '0');
-        updateDisplay();
-    });
+    // Ensure the display is correct on load
+    updateDisplay();
+
+    function hideProfitMenu() {
+        const profitMenu = document.getElementById('profitMenu');
+        profitMenu.style.top = '-100px';
+        setTimeout(() => {
+            profitMenu.style.display = 'none';
+        }, 500); // Time must match the transition duration in CSS
+    }
 });

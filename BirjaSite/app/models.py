@@ -91,6 +91,7 @@ class Position(models.Model):
     open_time = models.DateTimeField(auto_now_add=True)
     duration = models.IntegerField()
     closed = models.BooleanField(default=False)
+    demo = models.BooleanField(default=False)
     profit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
