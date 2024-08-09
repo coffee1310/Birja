@@ -57,12 +57,5 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Ensure the display is correct on load
     updateDisplay();
-
-    function hideProfitMenu() {
-        const profitMenu = document.getElementById('profitMenu');
-        profitMenu.style.top = '-100px';
-        setTimeout(() => {
-            profitMenu.style.display = 'none';
-        }, 500); // Time must match the transition duration in CSS
-    }
+    
 });

@@ -7,19 +7,26 @@
         <option value="{{ crypto.symbol }}">{{ crypto.name }}</option>
     {% endfor %}
 </select>
-<select id="chartType">
-    <option value="line">Line Chart</option>
-    <option value="candlestick">Candlestick</option>
-</select>
-
-<select id="timeRangeButtons" class="timeRangeButtons">
-    <option value="6m">6 months</option>
-    <option value="1m">1 month</option>
-    <option value="1w">1 week</option>
-    <option value="1d">1 day</option>
-    <option value="1h">1 hour</option>
-</select>
-
+<div class="menu-container">
+    <button id="menu-toggle">Настройки</button>
+    <div id="settings-menu" class="hidden">
+        <div class="menu-content">
+            <h4>Типы графика</h4>
+            <div class="graphic-type">
+                <button class="chart-type" data-chart-type="line">Линия</button>
+                <button class="chart-type" data-chart-type="candlestick">Свечи</button>
+                <button class="chart-type" data-chart-type="ohlc">Бары</button>
+                <button class="chart-type" data-chart-type="heikin-ashi">Хейкен Аши</button>
+            </div>
+            <h4>Интервал</h4>
+            <button class="interval" data-interval="6M">6M</button>
+            <button class="interval" data-interval="1M">1M</button>
+            <button class="interval" data-interval="1W">1W</button>
+            <button class="interval" data-interval="1D">1D</button>
+            <button class="interval" data-interval="1H">1H</button>
+        </div>
+    </div>
+</div>
 <div id="profitMenu"></div>
 
 <div class="chart-container">
@@ -66,6 +73,7 @@
 
 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/js/timer.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/js/settingsToggle.js' %}"></script>
 
 <script type="text/javascript">
 document.addEventListener("DOMContentLoaded", function() {
