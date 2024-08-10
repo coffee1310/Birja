@@ -59,84 +59,106 @@ const chartConfig = {
     type: chartType,  // Ваш тип графика (например, 'candlestick')
     data: {
         labels: [],  // Метки времени (например, ['2023-01-01', '2023-01-02', ...])
-        datasets: [{
-            data: [],  // Данные графика
-            backgroundColor: 'rgba(75, 192, 192, 0.5)',  // Цвет для фона (если это линейный график)
-            borderColor: 'rgba(75, 192, 192, 1)',  // Цвет границы
-            borderWidth: 1,  // Толщина границы
-            fill: true,  // Заливка под графиком
-            color: {
-                up: '#249D92',  // Цвет для положительных свечей
-                down: '#C95454',  // Цвет для отрицательных свечей
-                unchanged: '#999999'  // Цвет для неизмененных свечей
+        datasets: [
+            {
+                data: [],  // Данные для основного графика (свечи или бары)
+                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                fill: true,
+                color: {
+                    up: '#249D92',
+                    down: '#C95454',
+                    unchanged: '#999999'
+                },
+                barThickness: 'flex',
+                backgroundColors: {
+                    up: 'rgba(69, 183, 52, 0.8)',
+                    down: 'rgba(255,62,31, 1)',
+                    unchanged: 'rgba(201, 203, 207, 1)',
+                },
+                borderColors: {
+                    up: 'rgb(75, 192, 192)',
+                    down: 'rgb(255, 99, 132)',
+                    unchanged: 'rgb(201, 203, 207)',
+                }
             },
-            barThickness: 'flex',  // Гибкая толщина баров
-            backgroundColors: {
-                up: 'rgba(69, 183, 52, 0.8)',  // Цвет фона для положительных свечей
-                down: 'rgba(255,62,31, 1)',  // Цвет фона для отрицательных свечей
-                unchanged: 'rgba(201, 203, 207, 1)',  // Цвет фона для неизмененных свечей
-            },
-            borderColors: {
-                up: 'rgb(75, 192, 192)',  // Цвет границы для положительных свечей
-                down: 'rgb(255, 99, 132)',  // Цвет границы для отрицательных свечей
-                unchanged: 'rgb(201, 203, 207)',  // Цвет границы для неизмененных свечей
+            {
+                type: 'bar',  // Тип графика для объемов
+                label: 'Volume',  // Название (можно убрать)
+                data: [],  // Данные для объемов
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderWidth: 1,
+                yAxisID: 'y1',  // Связываем с другой осью Y
             }
-        }],
+        ],
     },
     options: {
         animation: {
-            duration: 100,  // Длительность анимации
+            duration: 100,
         },
-        transitions: 'hide',  // Переход при скрытии
-        responsive: true,  // Адаптивность
-        maintainAspectRatio: false,  // Сохранение соотношения сторон
+        transitions: 'hide',
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
             x: {
-                type: 'time',  // Тип шкалы
+                type: 'time',
                 time: {
-                    unit: 'minute',  // Единица измерения времени
-                    tooltipFormat: 'll',  // Формат отображения даты при наведении
+                    unit: 'minute',
+                    tooltipFormat: 'll',
                 },
                 ticks: {
-                    color: 'white',  // Цвет подписей по оси X
-                    maxRotation: 0,  // Отключает поворот подписей
+                    color: 'white',
+                    maxRotation: 0,
                     minRotation: 0,
                 },
                 grid: {
-                    display: true,  // Отображение сетки
-                    color: 'rgba(255, 255, 255, 0.05)',  // Цвет линий сетки
-                    lineWidth: 1,  // Толщина линий сетки
+                    display: true,
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    lineWidth: 1,
                 }
             },
             y: {
-                beginAtZero: false,  // Начинать с нуля
-                position: 'right',  // Позиция оси Y
+                beginAtZero: false,  // Ось для цены
+                position: 'right',
                 ticks: {
-                    color: 'white',  // Цвет подписей по оси Y
+                    color: 'white',
                 },
                 grid: {
-                    display: true,  // Отображение сетки
-                    color: 'rgba(255, 255, 255, 0.05)',  // Цвет линий сетки
-                    lineWidth: 1,  // Толщина линий сетки
+                    display: true,
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    lineWidth: 1,
                 }
             },
+            y1: {
+                beginAtZero: true,  // Ось для объемов
+                position: 'left',  // Позиция оси Y1
+                grid: {
+                    display: false,  // Скрываем сетку для объемов
+                },
+                ticks: {
+                    color: 'rgba(54, 162, 235, 1)',  // Цвет подписей для объемов
+                },
+                offset: true,  // Размещает ось Y1 под основной осью
+            }
         },
         plugins: {
-            crosshair: false,  // Отключение перекрестия, чтобы не было лишних линий
+            crosshair: false,
             annotation: {
                 annotations: {
                     horizontalLine: {
                         type: 'line',
                         drawTime: 'afterDatasetsDraw',
-                        borderColor: 'rgba(75, 192, 192, 0.8)',  // Цвет линии
-                        borderWidth: 2,  // Толщина линии
-                        borderDash: [5, 5],  // Пунктирная линия
+                        borderColor: 'rgba(75, 192, 192, 0.8)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
                         label: {
                             enabled: true,
-                            content: 'Price',  // Текст для отображения
+                            content: 'Price',
                             position: 'start',
-                            backgroundColor: 'rgba(75, 192, 192, 0.8)',  // Цвет фона текста
-                            color: '#fff',  // Цвет текста
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                            color: '#fff',
                             font: {
                                 size: 12
                             }
@@ -145,9 +167,9 @@ const chartConfig = {
                     verticalLine: {
                         type: 'line',
                         drawTime: 'afterDatasetsDraw',
-                        borderColor: 'rgba(75, 192, 192, 0.8)',  // Цвет вертикальной линии
-                        borderWidth: 2,  // Толщина вертикальной линии
-                        borderDash: [5, 5],  // Пунктирная линия
+                        borderColor: 'rgba(75, 192, 192, 0.8)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
                     }
                 }
             },
@@ -156,41 +178,41 @@ const chartConfig = {
             },
             zoom: {
                 pan: {
-                    enabled: false,  // Панорамирование отключено
+                    enabled: false,
                 },
                 zoom: {
                     wheel: {
-                        enabled: false,  // Масштабирование колесиком отключено
+                        enabled: false,
                     },
                     drag: {
-                        enabled: false,  // Масштабирование перетаскиванием отключено
+                        enabled: false,
                     },
                     pinch: {
-                        enabled: false,  // Масштабирование щипком отключено
+                        enabled: false,
                     },
-                    mode: 'x',  // Режим масштабирования
+                    mode: 'x',
                 },
-                zoomLevel: 0  // Начальный уровень масштабирования
+                zoomLevel: 0
             }
         },
         elements: {
             candlestick: {
-                barPercentage: 1.0,  // Процент ширины столбцов
-                categoryPercentage: 0.5,  // Процент ширины категории
-                barThickness: 0.1,  // Толщина свечей
-                borderColor: 'rgba(0, 0, 0, 1)',  // Цвет границы свечей
-                borderWidth: 1,  // Толщина границы свечей
-                borderRadius: 5,  // Радиус закругления углов свечей
+                barPercentage: 1.0,
+                categoryPercentage: 0.5,
+                barThickness: 0.1,
+                borderColor: 'rgba(0, 0, 0, 1)',
+                borderWidth: 1,
+                borderRadius: 5,
             },
             point: {
-                radius: 0,  // Убирает точки на графике
-                hitRadius: 5,  // Увеличивает область отклика точки для взаимодействия
-                hoverRadius: 5,  // Увеличивает радиус точки при наведении
+                radius: 0,
+                hitRadius: 5,
+                hoverRadius: 5,
             },
             bar: {
                 borderWidth: 1,
-                borderRadius: 4,  // Закругление углов баров
-                borderSkipped: false,  // Границы, которые не нужно рисовать (отключаем, чтобы рисовать все)
+                borderRadius: 4,
+                borderSkipped: false,
             }
         },
         onHover: (event, chartElement) => {
@@ -321,7 +343,12 @@ const chartTypeSelect = document.getElementById('chartType');
                 }
     
                 loadedData = loadedData.sort((a, b) => a.time - b.time);
-                
+                const volumes = loadedData.map(point => ({
+                    x: new Date(point.time * 1000),
+                    y: point.volume  // Используйте поле с объемами
+                }));
+                chartConfig.data.datasets[1].data = volumes;
+                console.log(chartConfig.data.datasets[1].data);
                 updateChart(chartType, timeUnit);
                 
             } else {
