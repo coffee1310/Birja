@@ -36,8 +36,16 @@
             <div class="sidebar">
                 <div class="items">
                     <div class="menu-item">
+                        <a href="{% url 'index' %}"><img src="{% static 'app/img/home.png' %}" alt="Trade"></a>
+                        <span><a href="{% url 'index' %}">Home</a></span>
+                    </div>
+                    <div class="menu-item">
                         <a href="{% url 'trade' %}"><img src="{% static 'app/img/trade.png' %}" alt="Trade"></a>
                         <span><a href="{% url 'trade' %}">Trade</a></span>
+                    </div>
+                    <div class="menu-item">
+                        <a href="{% url 'demo_trade' %}"><img src="{% static 'app/img/demo.png' %}" alt="Trade"></a>
+                        <span><a href="{% url 'demo_trade' %}">Demo</a></span>
                     </div>
                     <div class="menu-item">
                         <a href="{% url 'profile' %}"><img src="{% static 'app/img/profile_1.png' %}" alt="Profile"></a>

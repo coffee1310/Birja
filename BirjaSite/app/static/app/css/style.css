@@ -2,6 +2,7 @@ body {
     font-family: Inner, sans-serif;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 section {
@@ -502,6 +503,17 @@ section {
     z-index: 5;
 }
 
+#volumeChart {
+    position: absolute;
+    left: 0;
+    pointer-events: none;
+    z-index: -22;
+    display: block; 
+    box-sizing: border-box;
+    width: 100%;
+    height: 200px;
+}
+
 #profitMenu {
     display: none;
     position: fixed;
@@ -517,6 +529,16 @@ section {
     transition: top 0.5s ease, display 0.5s;
 }
 
+.volume {
+    padding: 0;
+    height: 200px;
+    margin-top: -220px;
+    position: absolute;
+    left: -10px;
+    width: calc(95%);
+    z-index: -22;
+}
+
 .body {
     background: #12151d no-repeat center center fixed;
     background-size: cover;
@@ -529,16 +551,15 @@ section {
 }
 
 .cryptoSelect {
-    top: 100px;
+    top: 70px;
     left: 150px;
     position: absolute;
-    background-color: #249D92;
+    background-color: #1e1e2f;
     color: #FFFFFF;
     width: 150px;
-    height: 30px;
+    height: 35px;
     border: 0;
     border-radius: 5px;
-    opacity: 0.7;
 }
 
 #chartType {
@@ -731,6 +752,7 @@ input[type=number] {
     position: absolute;
     top: 40px;
     right: 0;
+    left: 0;
     background-color: #1e1e2f;
     padding: 20px;
     border-radius: 10px;
@@ -740,7 +762,7 @@ input[type=number] {
 .menu-container {
     position: absolute;
     left: 320px;
-    top: 100px;
+    top: 70px;
 }
 
 .menu-content {
@@ -784,11 +806,224 @@ input[type=number] {
     margin-right: 10px;
 }
 
+#interval-toggle, #menu-toggle, #settings-toggle {
+    padding: 5px;
+    width: 35px;
+    height: 35px;
+    border-radius: 5px;
+    background-color: #1e1e2f;
+    border: 0;
+    cursor: pointer;
+}
+
+.menu-interval {
+    position: absolute;
+    left: 370px;
+    top: 70px;
+}
+
+#interval-menu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: #1e1e2f;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100px;
+    left: 0px;
+}
+
+#interval-menu-2 {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: #1e1e2f;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100px;
+    left: 0px;
+}
+
+.interval-content {
+    left: 420px;
+    top: 100px;
+}
+
+.interval-content button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #2a2a3d;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.interval-content-2 button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #2a2a3d;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.interval-content button {
+    width: 100px;
+}
+
+.interval-content h4 {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.interval-content label {
+    display: block;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.interval-content label input {
+    margin-right: 10px;
+}
+
+
+.menu-settings {
+    position: absolute;
+    left: 470px;
+    top: 70px;
+}
+
+#settings2-menu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: #1e1e2f;
+    padding: 20px;
+    border-radius: 10px;
+    width: 220px; /* Увеличена ширина для двух элементов */
+    left: 0px;
+}
+
+#interval-toggle-2 {
+    padding: 5px;
+    width: 35px;
+    height: 35px;
+    border-radius: 5px;
+    background-color: #1e1e2f;
+    border: 0;
+    cursor: pointer;
+}
+
+.settings-content {
+    display: flex;
+    flex-wrap: wrap; /* Позволяет элементам переходить на новую строку */
+    justify-content: space-between; /* Распределение пространства между элементами */
+}
+
+.settings-content h3 {
+    width: 50%; /* Каждый заголовок занимает половину строки */
+    color: white;
+    margin-bottom: 10px;
+}
+
+.settings-content label {
+    width: 50%; /* Каждый переключатель занимает половину строки */
+    display: flex;
+    align-items: center; /* Выравнивание по вертикали */
+    margin-bottom: 10px;
+}
+
+.settings-content label .switch {
+    margin-left: auto; /* Перемещает переключатель вправо */
+}
+
+.menu-interval-2 {
+    position: absolute;
+    left: 420px;
+    top: 70px;
+}
+
+.menu-content button:hover, .interval-content button:hover, .settings-content button:hover, .interval-content-2 button:hover {
+    background-color: #36364d;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+/* Скрываем стандартный чекбокс */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Стиль переключателя */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 20px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+    width: 50px;
+    height: 25px;
+}
+
+/* Стиль круглого элемента внутри переключателя */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 15px;
+    width: 15px;
+    left: 3px;
+    bottom: 5px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+/* Изменение фона и положения кружка при включенном состоянии */
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px);
+}
 
 @media (max-width: 768px) {
+    .menu-interval {
+        position: absolute;
+        left: 110px;
+        top: 70px;
+    }
+
+    .menu-interval-2 {
+        position: absolute;
+        left: 150px;
+        top: 70px;
+    }
+
+    .menu-settings {
+        position: absolute;
+        left: 190px;
+        top: 70px;
+    }
+
     .cryptoSelect {
         left: 100px;
-        top: 100px;
+        top: 70px;
         width: 50px;
     }
 
@@ -868,6 +1103,34 @@ input[type=number] {
 
     #profitMenu strong {
         font-size: 10px;
+    }
+
+    #settings2-menu {
+        position: absolute;
+        top: 40px;
+        right: 0;
+        left: -100px;
+        background-color: #1e1e2f;
+        padding: 20px;
+        border-radius: 10px;
+        width: 200px;
+    }
+
+    #settings-menu {
+        position: absolute;
+        top: 40px;
+        right: 0;
+        left: -100px;
+        background-color: #1e1e2f;
+        padding: 20px;
+        border-radius: 10px;
+        width: 100px;
+    }
+
+    .menu-container {
+        position: absolute;
+        left: 230px;
+        top: 70px;
     }
 }
 

@@ -8,17 +8,23 @@
     {% endfor %}
 </select>
 <div class="menu-container">
-    <button id="menu-toggle">Настройки</button>
+    <button id="menu-toggle"><img src="{% static 'app/img/line_chart.png' %}" width="20px"></button>
     <div id="settings-menu" class="hidden">
         <div class="menu-content">
-            <h4>Типы графика</h4>
+            <h4>Chart type</h4>
             <div class="graphic-type">
                 <button class="chart-type" data-chart-type="line"><img src="{% static 'app/img/line_chart.png' %}" width="30px"></button>
                 <button class="chart-type" data-chart-type="candlestick"><img src="{% static 'app/img/candlesticks.png' %}" width="30px"></button>
                 <button class="chart-type" data-chart-type="ohlc"><img src="{% static 'app/img/bars.png' %}" width="30px"></button>
-                <button class="chart-type" data-chart-type="heikin-ashi">Хейкен Аши</button>
             </div>
-            <h4>Интервал</h4>
+        </div>
+    </div>
+</div>
+<div class="menu-interval">
+    <button id="interval-toggle"><img src="{% static 'app/img/clock.png' %}" width="20px"></button>
+    <div id="interval-menu" class="hidden">
+        <div class="interval-content">
+            <h4>Period</h4>
             <button class="interval" data-interval="6M">6M</button>
             <button class="interval" data-interval="1M">1M</button>
             <button class="interval" data-interval="1W">1W</button>
@@ -27,6 +33,51 @@
         </div>
     </div>
 </div>
+
+<div class="menu-interval-2">
+    <button id="interval-toggle-2">
+        <img src="{% static 'app/img/interval.png' %}" width="20px">
+    </button>
+    <div id="interval-menu-2" class="hidden">
+        <div class="interval-content-2">
+            <h4 style="color: white;">Interval</h4>
+            <div id="interval-buttons-2">
+            </div> <!-- Контейнер для кнопок интервалов -->
+        </div>
+    </div>
+</div>
+
+<div class="menu-settings">
+    <button id="settings-toggle"><img src="{% static 'app/img/settings.png' %}" width="20px"></button>
+    <div id="settings2-menu" class="hidden">
+        <div class="settings-content">
+            <h3>Points</h3>
+            <label class="switch">
+                <input type="checkbox" id="toggle-points">
+                <span class="slider"></span>
+            </label>
+
+            <h3>Fill</h3>
+            <label class="switch">
+                <input type="checkbox" id="toggle-fill" checked>
+                <span class="slider"></span>
+            </label>
+
+            <h3>Volumes</h3>
+            <label class="switch">
+                <input type="checkbox" id="toggle-volumes">
+                <span class="slider"></span>
+            </label>
+
+            <h3>Sma & Ema</h3>
+            <label class="switch">
+                <input type="checkbox" id="toggle-sma-ema">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+</div>
+
 <div id="profitMenu"></div>
 
 <div class="chart-container">
@@ -68,6 +119,9 @@
 
 <div class="graphic">
     <canvas id="cryptoChart"></canvas>
+    <div class="volume">
+        <canvas id="volumeChart" style="position:absolute; left:0px;pointer-events:none; height: 100px;" ></canvas>
+    </div>
     <canvas id="highlightCanvas" style="position:absolute; top:100; left:30px; pointer-events:none;"></canvas>
 </div>
 
@@ -114,19 +168,21 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function startTimer() {
-        if (is_one_pos !== true) {
+        const hours = parseInt(document.getElementById('hours').value, 10);
+        const minutes = parseInt(document.getElementById('minutes').value, 10);
+        const seconds = parseInt(document.getElementById('seconds').value, 10);
+        const totalTime = (hours * 3600) + (minutes * 60) + seconds;
+
+        if (is_one_pos !== true || totalTime < 30) {
             alert('Position not open');
             return
         }
         is_one_pos = false;
         alert('Position opened successfully!', hideProfitMenu());
 
-        const hours = parseInt(document.getElementById('hours').value, 10);
-        const minutes = parseInt(document.getElementById('minutes').value, 10);
-        const seconds = parseInt(document.getElementById('seconds').value, 10);
-        const totalTime = (hours * 3600) + (minutes * 60) + seconds;
+        
 
-        let timeLeft = totalTime;
+        let timeLeft = totalTime + 1;
         const timer = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(timer);
