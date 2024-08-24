@@ -3,6 +3,10 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+}   
+
+.index-page {
+    overflow: visible;
 }
 
 section {
@@ -307,7 +311,7 @@ section {
 .sidebar {
     width: 70px;
     height: 100vh;
-    background: #000;
+    background: #151821;
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -362,7 +366,7 @@ section {
     justify-content: right;
     align-items: center;
     padding: 10px 20px;
-    background: #000;
+    background: #151821;
     color: #fff;
     width: 100%;
 }
@@ -415,7 +419,7 @@ section {
     right: 0;
     height: 100vh;
     width: 200px;
-    background: #000000;
+    background: #151821;
     z-index: 1;
 }
 
@@ -485,6 +489,29 @@ section {
     width: 150px;
 }
 
+/* Стили для кнопки "Select Time" */
+#timer-toggle {
+    background-color: #0066cc; /* Синий фон */
+    color: #ffffff; /* Белый текст */
+    border-radius: 8px; /* Закругленные углы */
+    padding: 10px 20px; /* Внутренние отступы */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Плавные переходы */
+}
+
+/* Анимация при наведении */
+#timer-toggle:hover {
+    background-color: #004999; /* Темно-синий фон при наведении */
+    transform: translateY(-3px); /* Поднятие кнопки при наведении */
+}
+
+/* Фокус на кнопке (например, при клике) */
+#timer-toggle:focus {
+    outline: none; /* Убираем стандартный контур */
+    background-color: #005bb5; /* Чуть светлее при фокусе */
+}
+
+
+
 .graphic {
     margin-left: 70px; 
     margin-bottom: 50px;
@@ -529,13 +556,11 @@ section {
     transition: top 0.5s ease, display 0.5s;
 }
 
-.volume {
-    padding: 0;
+.volume {   
     height: 200px;
     margin-top: -220px;
     position: absolute;
-    left: -10px;
-    width: calc(95%);
+    width: calc(100%);
     z-index: -22;
 }
 
@@ -576,7 +601,7 @@ section {
 }
 
 #timer-toggle {
-    background-color: #000000;
+    background-color: #151821;
     color: white;
     border: 0;
     font-size: 20px;
@@ -703,24 +728,29 @@ input[type=number] {
     margin-top: 20px;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .amount input {
-    width: 150px;
-    border: 0;
-    background-color: #000000;
-    color: white;
+    width: 160px;
+    padding: 12px;
+    background-color: #151821; /* Темный фон */
+    color: #e0e0e0; /* Светлый текст */
     font-size: 20px;
     text-align: center;
-}
-
-.amount form {
-    display: flex;
-    flex-direction: column;
+    border: none; /* Убираем стандартные границы */
+    border-bottom: 2px solid #555; /* Серое подчеркивание */
+    transition: all 0.3s ease; /* Плавный переход */
+    border-radius: 0; /* Убираем закругление */
+    outline: none; /* Убираем стандартное выделение */
 }
 
 .amount input:focus {
-    border: 0;
+    border-bottom-color: #00d1b2; /* Зеленое подчеркивание при фокусе */
+}
+
+.amount input:hover {
+    border-bottom-color: #00d1b2; /* Зеленое подчеркивание при наведении */
 }
 
 .timeRangeButtons {
@@ -739,6 +769,29 @@ input[type=number] {
 .menu-container {
     position: relative;
 }
+
+.notification {
+    position: fixed;
+    bottom: -100px; /* Начальная позиция за пределами экрана */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    font-size: 16px;
+    opacity: 0;
+    transition: bottom 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    z-index: 1000;
+}
+
+/* Появление уведомления */
+.notification.show {
+    bottom: 20px; /* Конечная позиция на экране */
+    opacity: 1;
+}
+
 
 #menu-toggle {
     background-color: #1e1e2f;

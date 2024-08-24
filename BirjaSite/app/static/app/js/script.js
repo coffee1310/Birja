@@ -125,6 +125,13 @@ const chartConfig = {
                 position: 'right',
                 ticks: {
                     color: 'white',
+                    font: {
+                        size: 16 // задаем размер шрифта здесь
+                    },
+                    callback: function(value) {
+                        // Дополнительная настройка для отображения значений
+                        return value.toFixed(2);
+                    }
                 },
                 grid: {
                     display: true,
@@ -245,8 +252,10 @@ const volumeChartConfig = {
             borderColor: 'rgba(69, 183, 52, 1)',  // Цвет границы баров
             borderWidth: 1,  // Толщина границы
             barThickness: 'flex',
+            barPercentage: 1,
+            categoryPercentage: 0.8,
             backgroundColor: 'rgba(36, 78, 117, 1)',
-            borderRadius: 2
+            borderRadius: 2,
         }],
     },
     options: {
@@ -254,28 +263,73 @@ const volumeChartConfig = {
         maintainAspectRatio: false,
         scales: {
             x: {
-                type: 'time',  // Тип шкалы - временная
+                type: 'time',
                 time: {
-                    unit: 'minute'  // Единица времени
-                },
-                grid: {
-                    display: false  // Скрываем сетку на оси X
+                    unit: 'minute',
+                    tooltipFormat: 'll',
                 },
                 ticks: {
-                    display: false  // Скрываем метки на оси X, так как они будут показаны на основном графике
+                    display: false,
+                    color: 'rgba(255, 255, 255, 0)',
+                    maxRotation: 0,
+                    minRotation: 0,
+                },
+                grid: {
+                    display: false,
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    lineWidth: 1,
                 }
             },
             y: {
-                beginAtZero: true,  // Начинать шкалу Y с нуля
-            }
+                beginAtZero: true,  // Ось для цены
+                position: 'right',
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0)',
+                    font: {
+                        size: 16 // задаем размер шрифта здесь
+                    },
+                    callback: function(value) {
+                        // Дополнительная настройка для отображения значений
+                        return value.toFixed(2);
+                    }
+                },
+                grid: {
+                    display: false,
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    lineWidth: 1,
+                }
+            },
         },
         plugins: {
             legend: {
                 display: false  // Скрываем легенду
             }
+        },
+        elements: {
+            candlestick: {
+                barPercentage: 1.0,
+                categoryPercentage: 0.5,
+                barThickness: 0.1,
+                borderColor: 'rgba(0, 0, 0, 1)',
+                borderWidth: 1,
+                borderRadius: 5,
+            },
+            bar: {
+                borderWidth: 1,
+                borderRadius: 4,
+                borderSkipped: false,
+            }
         }
     }
 };
+
+const highlightChartConfig = {
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+    }
+};
+
 const canvas = document.getElementById('highlightCanvas');
 const ctx2 = canvas.getContext('2d');
 let canvasChart;
@@ -308,7 +362,8 @@ function createChart() {
     if (emaSmaChecked) {
         fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
     }
-    canvasChart = new Chart(ctx2);
+    canvasChart = new Chart(ctx2, highlightChartConfig);
+    
 }
 
 createChart();
@@ -325,16 +380,16 @@ createChart();
 
     async function fetchAndAddDataToChart(symbol, range, chartType, startTime, append = false, isInterval = false) {
         const screenWidth = window.innerWidth;
-        clearChart();
-        loadedData = [];
+        currentChart.options.scales.x.time.unit = timeUnit;
         switch (range) {
             case '6M':
                 if (!isInterval) {
                     interval = screenWidth > 576 ? 7 : 25;
                     limit = 210;
                     timeUnit = 'day';
-                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&limit=210&api_key=${apiKey}`;
+                    url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=${currency}&limit=${limit}&api_key=${apiKey}`;
                 }
+                console.log(1);
                 break;
             case '1M':
                 if (!isInterval) {
@@ -390,7 +445,6 @@ createChart();
             if (data.Response === "Success") {
                 let newData = [];
                 let volumes = [];
-        
                 for (let i = data.Data.Data.length; i > 0; i -= interval) {
                     const intervalData = data.Data.Data.slice(i, i + interval);
         
@@ -416,7 +470,7 @@ createChart();
                                 high: Math.max(...intervalData.map(point => point.high)),
                                 low: Math.min(...intervalData.map(point => point.low)),
                                 close: endOfIntervalData.close,
-                                volume: totalVolume
+                                volume: totalVolume 
                             });
                         }
                     }
@@ -448,13 +502,13 @@ createChart();
                 // Обновляем данные по объемам
                 volumes = loadedData.map(point => ({
                     x: new Date(point.time * 1000),
-                    y: point.volume  // Используем поле с объемами
+                    y: point.volume * 1000 // Используем поле с объемами
                 }));
         
-                volumeChartConfig.data.datasets[0].data = volumes;
+                volumeChart.data.datasets[0].data = volumes;
         
                 updateChart(chartType, timeUnit);
-        
+
             } else {
                 console.error('Ошибка при получении данных:', data.Message);
             }
@@ -478,39 +532,57 @@ createChart();
 
     async function updatePriceData() {
         const crypto = cryptoSelect.value;
-        
         try {
             const apiEndpoint = 'https://min-api.cryptocompare.com/data/price?fsym=';
             const response = await fetch(`${apiEndpoint}${crypto}&tsyms=USD&api_key=${apiKey}`);
             const data = await response.json();
             const currentPrice = data.USD;
-            const currentTime = data.time; // Время в секундах
+            const currentTime = Date.now(); // Время в секундах
     
             // Если есть загруженные данные
             if (loadedData.length > 0) {
                 const lastDataPoint = loadedData[loadedData.length - 1];
-                const timeDifference = (currentTime - lastDataPoint.time) * 1000;
+                const timeDifference = (currentTime - new Date(currentChart.data.datasets[0].data.at(-1).x).getTime());
                 const intervalMilliseconds = convertIntervalToMilliseconds(interval, timeUnit);
-
                 if (timeDifference >= intervalMilliseconds) {
                     // Добавить новую точку данных
                     const newDataPoint = {
-                        x: new Date(currentTime * 1000),
+                        time: currentTime,
+                        open: currentPrice,
+                        high: currentPrice,
+                        low: currentPrice,
+                        close: currentPrice,
+                    };
+
+                    const newDataPoint2 = {
+                        x: new Date(currentTime),
                         o: currentPrice,
                         h: currentPrice,
                         l: currentPrice,
-                        c: currentPrice
+                        c: currentPrice,
                     };
                     loadedData.push(newDataPoint);
     
                     // Добавляем новую точку в график
                     if (chartType === 'candlestick' || chartType === 'ohlc') {
-                        currentChart.data.datasets[0].data.push(newDataPoint);
+                        currentChart.data.datasets[0].data.push(newDataPoint2);
                     } else {
                         currentChart.data.datasets[0].data.push(newDataPoint.close);
                     }
+                    volumeChart.data.datasets[0].data.shift();
+                    volumeChart.data.datasets[0].data.push(newDataPoint2);
+                    
+                    if (currentChart.data.labels) {
+                        loadedData.shift();
+                        console.log(currentChart.data.labels[0]);
+                        currentChart.data.datasets[0].data.shift();
+                        currentChart.options.scales.x.min += convertIntervalToMilliseconds(interval, timeUnit); // Сдвиг начала оси X на 1 минуту вперед
+                        currentChart.options.scales.x.max += convertIntervalToMilliseconds(interval, timeUnit);
+                        currentChart.update();
+                    }                    
                 } else {
                     // Обновить последнюю точку данных
+
                     const index = currentChart.data.datasets[0].data.length - 1;
                     const lastDataPoint2 = currentChart.data.datasets[0].data[index];
                     lastDataPoint2.c = currentPrice;
@@ -531,11 +603,11 @@ createChart();
             } else {
                 // Если данных еще нет, добавить первую точку данных
                 const newDataPoint = {
-                    x: new Date(currentTime * 1000),
-                    o: currentPrice,
-                    h: currentPrice,
-                    l: currentPrice,
-                    c: currentPrice
+                    time: new Date(currentTime),
+                    open: currentPrice,
+                    high: currentPrice,
+                    low: currentPrice,
+                    close: currentPrice
                 };
                 loadedData.push(newDataPoint);
     
@@ -686,7 +758,6 @@ createChart();
     }
     // Добавляем SMA на график
     currentChart.update();
-    
     }
 
     cryptoSelect.addEventListener('change', () => {
@@ -696,32 +767,11 @@ createChart();
         updateAnnotationsWithNewBounds(currentChart);
     });
 
-    // timeRangeButtons.addEventListener('change', (event) => {
-    //     const selectedRange = event.target.value;
-    //     currentRange = selectedRange;
-    //     clearChart();
-    //     fetchAndAddDataToChart(cryptoSelect.value, selectedRange, chartType);
-    // });
-
-    // chartTypeSelect.addEventListener('change', () => {
-    //     chartType = chartTypeSelect.value;
-    //     chartConfig.type = chartType === 'candlestick' ? 'candlestick' : 'line';
-    //     chartConfig.data.datasets[0].type = chartType;
-    //     chartConfig.data.datasets[0].backgroundColor = chartType === 'line' ? 'rgba(75, 192, 192, 0.5)' : undefined;
-    //     chartConfig.data.datasets[0].borderColor = chartType === 'line' ? 'rgba(75, 192, 192, 1)' : undefined;
-    //     chartConfig.data.datasets[0].borderWidth = chartType === 'line' ? 1 : undefined;
-    //     chartConfig.data.datasets[0].fill = chartType === 'line';
-    //     clearChart();
-    //     createChart();
-    //     updateChart();
-    //     fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
-    // });
-
     function handleChartTypeClick(Type) {
         chartType = Type;
         chartConfig.type = chartType;
         chartConfig.data.datasets[0].type = chartType;
-        chartConfig.data.datasets[0].backgroundColor = chartType === 'line' ? 'rgba(75, 192, 192, 0.5)' : undefined;
+        chartConfig.data.datasets[0].backgroundColor = chartType === 'line' ? 'rgba(75, 192, 192, 0)' : undefined;
         chartConfig.data.datasets[0].borderColor = chartType === 'line' ? 'rgba(75, 192, 192, 1)' : undefined;
         chartConfig.data.datasets[0].borderWidth = chartType === 'line' ? 1 : undefined;
         chartConfig.data.datasets[0].fill = chartType === 'line';
@@ -741,10 +791,14 @@ createChart();
     });
 
     function handleIntervalClick(inter) {
-        createChart();
-        clearChart();
         currentRange = inter;
-        fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType, undefined, false, false);
+        console.log(chartType)
+        clearChart();
+        createChart();
+        updateChart();
+        
+        fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
+        updateAnnotationsWithNewBounds(currentChart);
     }
     
     // Добавляем обработчики событий для всех кнопок интервала
@@ -754,8 +808,6 @@ createChart();
             handleIntervalClick(inter);
         });
     });
-
-    
 
     document.getElementById('cryptoChart').addEventListener('wheel', async (event) => {
         event.preventDefault();
@@ -795,18 +847,18 @@ createChart();
     
         currentChart.update();
         document.getElementById("cryptoChart").focus();
-    });
+    });;
     
     async function fetchAndAppendDataToChart(symbol, range, chartType) {
-        
-        const endTime = loadedData.length ? loadedData[loadedData.length - 1].time * 1000 : undefined;
         await updatePriceData();
     }
 
     fetchAndAddDataToChart(cryptoSelect.value, currentRange, chartType);
+    updateAnnotationsWithNewBounds(currentChart);
     
     setInterval(() => fetchAndAppendDataToChart(cryptoSelect.value, currentRange, chartType), 6000);
-
+    chartType = 'candlestick';
+    handleChartTypeClick('candlestick');
     const togglePoints = document.getElementById('toggle-points');
     const toggleFill = document.getElementById('toggle-fill');
     const toggleVolumes = document.getElementById('toggle-volumes');
@@ -925,7 +977,6 @@ createChart();
         ctx2.clearRect(0, 0, canvas.width, canvas.height);
         ctx2.fillStyle = 'rgba(0, 158, 37, 0.2)';
         ctx2.fillRect(0, 0, canvas.width, y);
-        console.log(1);
     }
 
     function highlightShort() {
@@ -933,7 +984,7 @@ createChart();
         const y = getYCoordinateForPrice(currentPrice);
         ctx2.clearRect(0, 0, canvas.width, canvas.height);
         ctx2.fillStyle = 'rgba(255, 0, 0, 0.2)';
-        ctx2.fillRect(0, y, canvas.width, canvas.height - y - 200);
+        ctx2.fillRect(0, y, canvas.width, canvas.height - y);
     }
 
     function clearHighlight() {
@@ -1247,8 +1298,7 @@ createChart();
             }
             chart.update();
         }, 100)
-        
-
-        console.log(yMaxLimit);
     }
+
+    
 });

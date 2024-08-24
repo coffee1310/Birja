@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+
 <select id="cryptoSelect" class="cryptoSelect">
     {% for crypto in cryptos %}
         <option value="{{ crypto.symbol }}">{{ crypto.name }}</option>
