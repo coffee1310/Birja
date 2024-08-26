@@ -1020,6 +1020,8 @@ createChart();
     currentChart.update();
     resizeCanvas();
 
+    let lineAnnotationId;
+    let labelAnnotationId;
     function addHorizontalLine(type) {
         const currentPrice = loadedData[loadedData.length - 1].close; // Текущая цена из последних данных
         const color = type === 'long' ? 'green' : 'red';
@@ -1027,66 +1029,55 @@ createChart();
         const minutes = parseInt(document.getElementById('minutes').value, 10);
         const seconds = parseInt(document.getElementById('seconds').value, 10);
         const totalTime = (hours * 3600) + (minutes * 60) + seconds;
-
-        const annotation = {
+        let start_timer_value = document.getElementById('timer-display');
+        // Предполагается, что time у вас в формате Unix timestamp или в формате ISO строки
+        const lineAnnotation = {
             type: 'line',
             yMin: currentPrice,  // Устанавливаем начальную точку линии по оси Y
             yMax: currentPrice,  // Устанавливаем конечную точку линии по оси Y (та же цена)
             borderColor: color,
             borderWidth: 2,
             borderDash: [5, 5],  // Пунктирная линия
-            label: {
-                enabled: true,
-                content: `${type.toUpperCase()} @ ${currentPrice}`,
-                position: 'start',  // Позиция текста
-                backgroundColor: color,
-                color: '#fff',  // Цвет текста
-                font: {
-                    size: 12
-                }
-            }
         };
-    
+
+        // Аннотация метки
+        const labelAnnotation = {
+            type: "label",
+            yValue: currentPrice, // y-позиция
+            xValue: currentChart.options.scales.x.max, // x-позиция (последнее значение времени в формате даты)
+            content: `${start_timer_value.textContent} @ ${currentPrice}`, // Текст метки
+            font: {
+                size: 12
+            },
+            color: "#fff",
+            backgroundColor: color,
+            padding: 6,
+            xAdjust: -70, // Смещение метки немного влево от края
+        };
+
         // Проверяем, инициализированы ли аннотации
         if (!currentChart.options.plugins.annotation) {
             currentChart.options.plugins.annotation = {
                 annotations: {}
             };
         }
-    
+
         // Ограничение на количество аннотаций (например, до 6)
         if (Object.keys(currentChart.options.plugins.annotation.annotations).length <= 2 && totalTime > 30) {
-            const annotationId = `annotation_${Date.now()}`; // Генерируем уникальный ID для аннотации
-            currentChart.options.plugins.annotation.annotations[annotationId] = annotation;
-            startTimer();  // Запуск таймера
+            lineAnnotationId = `line_annotation_${Date.now()}`; // Генерируем уникальный ID для линии
+            labelAnnotationId = `label_annotation_${Date.now()}`; // Генерируем уникальный ID для метки
+
+            // Добавляем аннотации в график
+            currentChart.options.plugins.annotation.annotations[lineAnnotationId] = lineAnnotation;
+            currentChart.options.plugins.annotation.annotations[labelAnnotationId] = labelAnnotation;
+
             hideProfitMenu();  // Скрытие меню прибыли
         }
-    
+
         // Обновление графика
         currentChart.update();
     }
 
-    function startTimer() {
-        const hours = parseInt(document.getElementById('hours').value, 10);
-        const minutes = parseInt(document.getElementById('minutes').value, 10);
-        const seconds = parseInt(document.getElementById('seconds').value, 10);
-        const totalTime = (hours * 3600) + (minutes * 60) + seconds;
-
-        let timeLeft = totalTime;
-        const timer = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                const annotations = currentChart.options.plugins.annotation.annotations;
-                const annotationKeys = Object.keys(annotations);
-                const lastKey = annotationKeys[annotationKeys.length - 1];
-                delete annotations[lastKey];
-                currentChart.update();
-                return;
-            }
-
-            timeLeft--;
-        }, 1000);
-    }
 
     function hideProfitMenu() {
         const profitMenu = document.getElementById('profitMenu');
@@ -1318,5 +1309,214 @@ createChart();
         }, 100)
     }
 
-    
+    const amountInput = document.getElementById('amount');
+    const timerDisplay = document.getElementById('timer-display');
+    let is_one_pos = true;
+
+    window.preparePosition = function(positionType) {
+        const amount = parseFloat(amountInput.value);
+        checkUserBalance(amount)
+            .then(balanceOk => {
+                if (balanceOk) {
+                    startTimer();
+                    openPosition(positionType, amount);
+                } else {
+                }
+            })
+            .catch(error => console.error('Error checking balance:', error));
+    };
+
+    function checkUserBalance(amount) {
+        const csrftoken = getCookie('csrаftoken');
+        return fetch('/check_demo_balance/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ amount: amount })
+        })
+        .then(response => response.json())
+        .then(data => data.balance_ok)
+        .catch(error => {
+            console.error('Error checking balance:', error);
+            return false;
+        });
+    }
+
+    function startTimer() {
+        const hours = parseInt(document.getElementById('hours').value, 10);
+        const minutes = parseInt(document.getElementById('minutes').value, 10);
+        const seconds = parseInt(document.getElementById('seconds').value, 10);
+        const totalTime = (hours * 3600) + (minutes * 60) + seconds;
+        let label_annotation = currentChart.options.plugins.annotation.annotations[labelAnnotationId];
+        let line_annotation = currentChart.options.plugins.annotation.annotations[lineAnnotationId];
+
+        if (totalTime < 30) {
+            showNotification('Use more time');
+            return;
+        }
+        if (is_one_pos !== true) {
+            showNotification('You cannot open more than 1 position');
+            return;
+        }
+        is_one_pos = false;
+        showNotification('Position opened successfully!');
+        hideProfitMenu();
+
+        let timeLeft = totalTime + 1;
+        const timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                timerDisplay.textContent = `${document.getElementById('hours').value.padStart(2, '0')}:${document.getElementById('minutes').value.padStart(2, '0')}:${document.getElementById('seconds').value.padStart(2, '0')}`;
+                is_one_pos = true;
+                fetchBalance();
+                updateProfitMenu();
+                const annotations = currentChart.options.plugins.annotation.annotations;
+                const annotationKeys = Object.keys(annotations);
+                const lastKey = annotationKeys[annotationKeys.length - 1];
+                delete annotations[lineAnnotationId]; // Генерируем уникальный ID для линии
+                delete annotations[labelAnnotationId];
+                currentChart.update();
+                return;
+            }
+
+            timeLeft--;
+            const hrs = Math.floor(timeLeft / 3600);
+            const mins = Math.floor((timeLeft % 3600) / 60);
+            const secs = timeLeft % 60;
+
+            const currentPrice = currentChart.data.datasets[0].data.at(-1).c; // Текущая цена из последних данных
+            timerDisplay.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            label_annotation.content =  `${timerDisplay.textContent} @ ${currentPrice}$`;
+            label_annotation.yValue = currentPrice;
+            line_annotation.yMax = currentPrice;
+            line_annotation.yMin = currentPrice;
+
+            currentChart.update();
+        }, 1000);
+    }
+
+    window.openPosition = function(positionType, amount) {
+        const symbol = cryptoSelect.value;
+        const duration = parseInt(timerDisplay.textContent.split(':').reduce((acc, time) => (60 * acc) + +time));
+
+        const csrftoken = getCookie('csrftoken');
+
+        fetch('/demo_trade/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                crypto: symbol,
+                amount: amount,
+                duration: duration,
+                position_type: positionType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            
+            if (data.status === 'success') {
+                console.log('Position opened successfully!');
+            } else {
+                console.log('Error opening position: ' + data.message);
+                showNotification('Position not open')
+            }
+        })
+        .catch(error => console.error('Error opening position:', error));
+    };
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function fetchBalance() {
+        const csrftoken = getCookie('csrftoken');
+
+        fetch('/update_demo_balance/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('balance').textContent = data.new_balance.toString() + '$';
+
+            } else {
+                console.error('Error fetching balance:', data.message);
+                console.log(data.new_balance);
+            }
+        })
+        .catch(error => console.error('Error fetching balance:', error));
+    }
+
+    async function fetchLatestProfit() {
+        try {
+            const response = await fetch('/latest-demo-profit/');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error fetching latest profit:", error);
+        }
+    }
+
+    function showProfitMenu(profit, date) {
+        const profitMenu = document.getElementById('profitMenu');
+        profitMenu.innerHTML = `<strong>Latest Profit:</strong> $${profit} on ${new Date(date).toLocaleString()}`;
+        profitMenu.style.display = 'flex';
+        setTimeout(() => {
+            profitMenu.style.top = '10px';
+        }, 10);
+    }
+
+    async function updateProfitMenu() {
+        const latestProfitData = await fetchLatestProfit();
+        if (latestProfitData) {
+            showProfitMenu(latestProfitData.profit, latestProfitData.date);
+        }
+    }
+
+    function hideProfitMenu() {
+        const profitMenu = document.getElementById('profitMenu');
+        profitMenu.style.top = '-100px';
+        setTimeout(() => {
+            profitMenu.style.display = 'none';
+        }, 500); // Time must match the transition duration in CSS
+    }
+
+    function showNotification(message) {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        
+        notificationText.textContent = message;
+        notification.classList.remove('hidden');
+        notification.classList.add('show');
+        if (message === 'Position opened successfully!') {
+            notification.style.backgroundColor = "#3b9630";
+        }
+        // Скрыть уведомление через 3 секунды
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 500); // Подождите до окончания анимации, прежде чем полностью скрыть элемент
+    }, 3000);
+}
 });
