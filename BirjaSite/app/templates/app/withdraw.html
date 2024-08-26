@@ -4,8 +4,8 @@
 {% block content %}
 <div>
     <div class="deposit-withdraw">
-        <button class="withdraw"><a href="{% url 'deposit' %}">Deposit</a></button>
-        <button class="deposit"><a href="{% url 'withdraw' %}">Withdraw</a></button>
+        <a href="{% url 'deposit' %}" class="withdraw" style="">Deposit</a>
+        <a href="{% url 'withdraw' %}" class="deposit" style="">Withdraw</a>
     </div>
 </div>
 <div class="withdraw-section">

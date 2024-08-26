@@ -562,6 +562,7 @@ section {
     position: absolute;
     width: calc(100%);
     z-index: -22;
+    left: 15px;
 }
 
 .body {
@@ -676,7 +677,7 @@ input[type=number] {
 }
 
 .timer-menu {
-    margin-top: 50px;
+    margin-top: 10px;
     text-align: center;
 }
 
@@ -693,7 +694,7 @@ input[type=number] {
     margin: 0 5px;
     display: flex;
     justify-content: center;
-    background-color: #000000;
+    background-color: #151821;
     color: white;
     font-size: 25px;
     border: 0;    
@@ -718,6 +719,10 @@ input[type=number] {
 
 #timer-confirm:hover {
     background-color: #262626;
+}
+
+#timer-display {
+    margin-top: 20px;
 }
 
 .timer-control span {
@@ -1053,6 +1058,142 @@ input:checked + .slider {
 
 input:checked + .slider:before {
     transform: translateX(30px);
+}
+
+/* Стиль для бокового меню */
+.history-menu {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #2f2f2f;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    z-index: 999;
+}
+
+/* Кнопка закрытия */
+.close-btn {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* Убедитесь, что нет лишних отступов */
+    margin: 0; /* Убедитесь, что нет лишних отступов */
+}
+
+.close-btn-cross {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.close-btn-cross::before,
+.close-btn-cross::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background: #fff;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.close-btn-cross::before {
+    transform: rotate(45deg) translateY(-50%);
+}
+
+.close-btn-cross::after {
+    transform: rotate(-45deg) translateY(-50%);
+}
+
+/* Стили для крестика при наведении */
+.close-btn:hover .close-btn-cross::before,
+.close-btn:hover .close-btn-cross::after {
+    background: #f44336; /* Цвет крестика при наведении */
+}
+
+/* Открытая кнопка истории */
+.open-history-btn {
+    padding: 10px 20px;
+    width: 150px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.open-history-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для формы фильтрации */
+.filters {
+    margin: 20px;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    font-size: 16px;
+    margin-right: 10px;
+    color: #ccc;
+}
+
+.filter-select {
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.apply-filters-btn {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.apply-filters-btn:hover {
+    background-color: #218838;
+}
+
+/* Стили для истории сделок */
+.history-list {
+    padding: 20px;
+}
+
+.bet-item {
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.history-menu {
+    background-color: #151821;
 }
 
 @media (max-width: 768px) {
@@ -1640,9 +1781,14 @@ tbody {
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    text-align: center;
+    display: flex; /* Добавляем Flexbox */
+    justify-content: center; /* Центрируем содержимое по горизонтали */
+    align-items: center; /* Центрируем содержимое по вертикали */
+    text-decoration: none;
 }
 
-.deposit a {
+.deposit, .withdraw {
     color: white;
     text-decoration: none;
     z-index: 1;
@@ -1650,12 +1796,9 @@ tbody {
     transition: color 0.3s ease;
 }
 
-.withdraw a {
+.withdraw {
     color: #000;
-    text-decoration: none;
-    z-index: 1;
-    position: relative;
-    transition: color 0.3s ease;
+    background-color: #fff;
 }
 
 .deposit::before, .withdraw::before {
@@ -1673,21 +1816,16 @@ tbody {
     background: linear-gradient(to right, rgba(36, 157, 146, 0.8), rgba(36, 157, 146, 0.8));
 }
 
-.deposit:hover::before, .withdraw:hover::before {
+.withdraw:hover::before {
     left: 0;
 }
 
-.deposit:hover a {
-    color: #f0f0f0; /* Новый цвет текста при наведении для "Пополнить" */
+.deposit:hover {
+    color: #f0f0f0; /* Новый цвет текста при наведении для "Deposit" */
 }
 
-.withdraw:hover a {
-    color: white; /* Новый цвет текста при наведении для "Вывести" */
-}
-
-.deposit {
-    background-color: #249D92;
-    color: white;
+.withdraw:hover {
+    color: white; /* Новый цвет текста при наведении для "Withdraw" */
 }
 
 .deposit {
@@ -1709,8 +1847,6 @@ tbody {
     display: flex;
     justify-content: left;
 }
-
-
 
 .crypto h1 {
     width: 100%;

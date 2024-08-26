@@ -493,3 +493,31 @@ def get_latest_profit(request):
         'date': latest_profit.open_time
     }
     return JsonResponse(data)
+
+
+def trade_demo_history(request):
+    status = request.GET.get('status', 'all')
+    sort_by = request.GET.get('sort_by', 'time_asc')
+
+    if status == 'closed':
+        bets = Position.objects.filter(closed=True)
+    elif status == 'open':
+        bets = Position.objects.filter(closed=False)
+    else:
+        bets = Position.objects.all()
+
+    if sort_by == 'time_asc':
+        bets = bets.order_by('open_time')
+    elif sort_by == 'time_desc':
+        bets = bets.order_by('-open_time')
+    elif sort_by == 'amount_asc':
+        bets = bets.order_by('amount')
+    elif sort_by == 'amount_desc':
+        bets = bets.order_by('-amount')
+
+    bet_list = list(bets.values('open_time', 'amount', 'profit', 'closed'))
+
+    # Преобразование времени в удобный формат
+    for bet in bet_list:
+        bet['open_time'] = bet['open_time'].strftime('%Y-%m-%d %H:%M:%S')
+    return JsonResponse(bet_list, safe=False)

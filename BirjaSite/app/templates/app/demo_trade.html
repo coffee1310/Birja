@@ -81,7 +81,44 @@
 <div id="profitMenu"></div>
 
 <div class="chart-container">
-    <div class="trade-controls">  
+    <div class="trade-controls"> 
+
+
+        <button id="openHistoryBtn" class="open-history-btn">Open Trade History</button>
+
+        <!-- Боковое меню для истории сделок -->
+        <div id="tradeHistoryMenu" class="history-menu">
+            <button id="closeHistoryBtn" class="close-btn">
+                <span class="close-btn-cross"></span>
+            </button>
+            
+            <!-- Форма для фильтрации и сортировки -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="status">Status:</label>
+                    <select id="status" class="filter-select">
+                        <option value="all">All</option>
+                        <option value="closed">Closed</option>
+                        <option value="open">Open</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sort">Sort By:</label>
+                    <select id="sort" class="filter-select">
+                        <option value="time_asc">Time (Asc)</option>
+                        <option value="time_desc">Time (Desc)</option>
+                        <option value="amount_asc">Amount (Asc)</option>
+                        <option value="amount_desc">Amount (Desc)</option>
+                    </select>
+                </div>
+                <button id="applyFilters" class="apply-filters-btn">Apply Filters</button>
+            </div>
+
+            <!-- История сделок -->
+            <div id="betHistory" class="history-list">
+                <!-- История сделок будет загружаться сюда -->
+            </div>
+        </div>
             <div class="timer-menu">
             <button id="timer-toggle">Select Time</button>
             <div id="timer-settings" class="timer-settings hidden">
@@ -132,7 +169,6 @@
 <script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/js/timer.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/js/settingsToggle.js' %}"></script>
-
 <script type="text/javascript">
 document.addEventListener("DOMContentLoaded", function() {
     const cryptoSelect = document.getElementById('cryptoSelect');
@@ -332,4 +368,5 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 });
 </script>
+<script type="text/javascript"  src="{% static 'app/js/history.js' %}"></script>
 {% endblock %}

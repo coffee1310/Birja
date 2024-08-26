@@ -23,5 +23,6 @@ urlpatterns = [
     path('check_balance/', check_balance, name='check_balance'),
     path('check_demo_balance/', check_demo_balance, name="check_demo_balance"),
     path('latest-demo-profit/', get_latest_demo_profit, name='latest-demo-profit'),
-    path('latest-profit/', get_latest_profit, name="latest-profit")
+    path('latest-profit/', get_latest_profit, name="latest-profit"),
+    path('trade-demo-history/', trade_demo_history, name='trade_history'),
 ]

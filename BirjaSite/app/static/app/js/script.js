@@ -82,6 +82,8 @@ const chartConfig = {
                     unchanged: '#999999'
                 },
                 barThickness: 'flex',
+                barPercentage: 1,
+                categoryPercentage: 0.8,
                 backgroundColors: {
                     up: 'rgba(69, 183, 52, 0.8)',
                     down: 'rgba(255,62,31, 1)',
@@ -93,6 +95,7 @@ const chartConfig = {
                     unchanged: 'rgb(201, 203, 207)',
                 }
             },
+            
         ],
     },
     options: {
@@ -193,14 +196,6 @@ const chartConfig = {
             }
         },
         elements: {
-            candlestick: {
-                barPercentage: 1.0,
-                categoryPercentage: 0.5,
-                barThickness: 0.1,
-                borderColor: 'rgba(0, 0, 0, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            },
             point: {
                 radius: 0,
                 hitRadius: 5,
@@ -306,14 +301,6 @@ const volumeChartConfig = {
             }
         },
         elements: {
-            candlestick: {
-                barPercentage: 1.0,
-                categoryPercentage: 0.5,
-                barThickness: 0.1,
-                borderColor: 'rgba(0, 0, 0, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            },
             bar: {
                 borderWidth: 1,
                 borderRadius: 4,
@@ -447,13 +434,11 @@ createChart();
                 let volumes = [];
                 for (let i = data.Data.Data.length; i > 0; i -= interval) {
                     const intervalData = data.Data.Data.slice(i, i + interval);
-        
+                    
                     if (intervalData.length > 0) {
                         const endOfIntervalData = intervalData[intervalData.length - 1];
-                        
                         // Собираем данные по объемам
                         const totalVolume = intervalData.reduce((sum, point) => sum + point.volumefrom, 0);
-        
                         if (intervalData.length === 1) {
                             newData.push({
                                 time: endOfIntervalData.time,
@@ -500,14 +485,15 @@ createChart();
                 loadedData = loadedData.sort((a, b) => a.time - b.time);
         
                 // Обновляем данные по объемам
-                volumes = loadedData.map(point => ({
+                volumes = currentChart.data.datasets[0].data.map(point => ({
                     x: new Date(point.time * 1000),
-                    y: point.volume * 1000 // Используем поле с объемами
+                    y: point.volume
                 }));
-        
+                
+                
                 volumeChart.data.datasets[0].data = volumes;
-        
                 updateChart(chartType, timeUnit);
+                updatePriceData();
 
             } else {
                 console.error('Ошибка при получении данных:', data.Message);
@@ -533,10 +519,18 @@ createChart();
     async function updatePriceData() {
         const crypto = cryptoSelect.value;
         try {
-            const apiEndpoint = 'https://min-api.cryptocompare.com/data/price?fsym=';
-            const response = await fetch(`${apiEndpoint}${crypto}&tsyms=USD&api_key=${apiKey}`);
+            const apiEndpoint = 'https://min-api.cryptocompare.com/data/v2/';
+            // Используем histominute для получения последних данных
+            const response = await fetch(`${apiEndpoint}histominute?fsym=${crypto}&tsym=USD&limit=1&api_key=${apiKey}`);
             const data = await response.json();
-            const currentPrice = data.USD;
+            const latestData = data.Data.Data[0];
+            
+            // Получаем необходимые значения
+            const currentOpen = latestData.open;
+            const currentHigh = latestData.high;
+            const currentLow = latestData.low;
+            const currentClose = latestData.close;
+            const currentVolume = latestData.volumefrom;
             const currentTime = Date.now(); // Время в секундах
     
             // Если есть загруженные данные
@@ -548,57 +542,85 @@ createChart();
                     // Добавить новую точку данных
                     const newDataPoint = {
                         time: currentTime,
-                        open: currentPrice,
-                        high: currentPrice,
-                        low: currentPrice,
-                        close: currentPrice,
+                        open: currentOpen,
+                        high: currentHigh,
+                        low: currentLow,
+                        close: currentClose,
+                        volume: currentVolume
                     };
 
                     const newDataPoint2 = {
                         x: new Date(currentTime),
-                        o: currentPrice,
-                        h: currentPrice,
-                        l: currentPrice,
-                        c: currentPrice,
+                        o: currentOpen,
+                        h: currentHigh,
+                        l: currentLow,
+                        c: currentClose,
+                        volume: currentVolume
                     };
-                    loadedData.push(newDataPoint);
-    
-                    // Добавляем новую точку в график
+                    
+                    let val = Math.log10(newDataPoint2.c);
+                    let volumePoint = currentVolume;
+                
+                    // Приведение объема к масштабу цены
+                    while (Math.log10(volumePoint) < val) {
+                        volumePoint *= 10;
+                    }
+                
+                    newDataPoint2.volume = volumePoint;
+                    newDataPoint.volume = volumePoint;
+                    
+                    //loadedData.push(newDataPoint2);
+                    
                     if (chartType === 'candlestick' || chartType === 'ohlc') {
                         currentChart.data.datasets[0].data.push(newDataPoint2);
                     } else {
                         currentChart.data.datasets[0].data.push(newDataPoint.close);
                     }
+                    currentChart.update();
                     volumeChart.data.datasets[0].data.shift();
-                    volumeChart.data.datasets[0].data.push(newDataPoint2);
                     
+                    volumeChart.data.datasets[0].data.push({x: new Date(currentTime), y: currentVolume * 10000});
+
                     if (currentChart.data.labels) {
                         loadedData.shift();
-                        console.log(currentChart.data.labels[0]);
                         currentChart.data.datasets[0].data.shift();
                         currentChart.options.scales.x.min += convertIntervalToMilliseconds(interval, timeUnit); // Сдвиг начала оси X на 1 минуту вперед
                         currentChart.options.scales.x.max += convertIntervalToMilliseconds(interval, timeUnit);
+                        volumeChart.options.scales.x.min += convertIntervalToMilliseconds(interval, timeUnit); // Сдвиг начала оси X на 1 минуту вперед
+                        volumeChart.options.scales.x.max += convertIntervalToMilliseconds(interval, timeUnit);
+                        volumeChart.update();
                         currentChart.update();
-                    }                    
+                    }              
+                    console.log(volumeChart.data.datasets[0].data);
+                    console.log(currentChart.data.datasets[0].data)     
                 } else {
                     // Обновить последнюю точку данных
-
                     const index = currentChart.data.datasets[0].data.length - 1;
                     const lastDataPoint2 = currentChart.data.datasets[0].data[index];
-                    lastDataPoint2.c = currentPrice;
-                    lastDataPoint2.h = Math.max(lastDataPoint.high, currentPrice);
-                    lastDataPoint2.l = Math.min(lastDataPoint.low, currentPrice);
+                    lastDataPoint2.c = currentClose;
+                    lastDataPoint2.h = lastDataPoint.high;
+                    lastDataPoint2.l = lastDataPoint.low;
 
-                    lastDataPoint.close = currentPrice;
-                    lastDataPoint.high = Math.max(lastDataPoint.high, currentPrice);
-                    lastDataPoint.low = Math.min(lastDataPoint.low, currentPrice);
+                    lastDataPoint.close = currentClose;
+                    lastDataPoint.high = lastDataPoint.high;
+                    lastDataPoint.low = lastDataPoint.low;
                     // Обновляем последнюю точку в графике
                     if (chartType == 'candlestick' || chartType === 'ohlc') {
                          currentChart.data.datasets[0].data[index] = lastDataPoint2;
-                         
                     } else {
                         currentChart.data.datasets[0].data[index] = lastDataPoint.close;
                     }
+
+                    let val = Math.log10(lastDataPoint2.c);
+                    let volumePoint = currentVolume;
+                
+                    // Приведение объема к масштабу цены
+                    while (Math.log10(volumePoint) < val) {
+                        volumePoint *= 10;
+                    }
+
+                    volumeChart.data.datasets[0].data[index].y = volumePoint;
+                    volumeChart.update(); 
                 }
             } else {
                 // Если данных еще нет, добавить первую точку данных
@@ -620,21 +642,22 @@ createChart();
             if (volumeChecked) {
                 volumeChart.options.scales.x.time.unit = timeUnit;
                 volumeChart.data.labels = currentChart.data.labels;
-                volumeChart.data.datasets[0].data = loadedData.map(point => ({
-                    x: new Date(point.time * 1000),
+                volumeChart.options.scales.x.min = currentChart.options.scales.x.min; // Сдвиг начала оси X на 1 минуту вперед
+                volumeChart.options.scales.x.max = currentChart.options.scales.x.max;
+                volumeChart.data.datasets[0].data = currentChart.data.datasets[0].data.map(point => ({
+                    x: point.x,
                     y: point.volume
                 }));
-                
                 volumeChart.update();
             }
+            console.log(volumeChart.data.datasets[0].data);
+            console.log(currentChart.data.datasets[0].data);
         } catch (error) {
             console.error("Error fetching current price:", error);
         }
     }
 
     function clearChart() {
-        console.log(currentChart.data.datasets[0]);
-        console.log(loadedData);
         loadedData = [];
         currentChart.data.labels = [];
         currentChart.data.datasets.forEach(dataset => {
@@ -664,17 +687,28 @@ createChart();
                 o: point.open,
                 h: point.high,
                 l: point.low,
-                c: point.close
+                c: point.close,
+                volume: point.volume
             }));
-    
             chartConfig.data.labels = prices.map(point => point.t);
-            chartConfig.data.datasets[0].data = prices.map(point => ({
-                x: point.t,
-                o: point.o,
-                h: point.h,
-                l: point.l,
-                c: point.c
-            }));
+            chartConfig.data.datasets[0].data = prices.map(point => {
+                let val = Math.log10(point.c);
+                let volume = point.volume;
+            
+                // Приведение объема к масштабу цены
+                while (Math.log10(volume) < val) {
+                    volume *= 10;
+                }
+            
+                return {
+                    x: point.t,
+                    o: point.o,
+                    h: point.h,
+                    l: point.l,
+                    c: point.c,
+                    volume: volume // Возвращаем конечное значение объема
+                };
+            });
         }
     
         chartConfig.options.scales.x.time.unit = timeUnit;
@@ -709,22 +743,6 @@ createChart();
     
             // Обновляем график объемов
             volumeChart.update();
-        }
-        
-        // Обновляем основной график
-        const screenWidth = window.innerWidth;
-        if (screenWidth > 576) {
-            currentChart.options.elements.candlestick = {
-                barThickness: 'flex',
-                categoryPercentage: 1.0,
-                barPercentage: 0.1,
-            };
-        } else {
-            currentChart.options.elements.candlestick = {
-                barThickness: 0.2,
-                categoryPercentage: 0.1,
-                barPercentage: 0.1,
-            };
         }
 
     if (emaSmaChecked) {
