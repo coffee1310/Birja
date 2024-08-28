@@ -1406,7 +1406,7 @@ createChart();
 
     function checkUserBalance(amount) {
         const csrftoken = getCookie('csrаftoken');
-        return fetch('/check_demo_balance/', {
+        return fetch('/check_balance/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1485,7 +1485,7 @@ createChart();
 
         const csrftoken = getCookie('csrftoken');
 
-        fetch('/demo_trade/', {
+        fetch('/trade/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1527,7 +1527,7 @@ createChart();
     function fetchBalance() {
         const csrftoken = getCookie('csrftoken');
 
-        fetch('/update_demo_balance/', {
+        fetch('/update_balance/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1548,7 +1548,7 @@ createChart();
 
     async function fetchLatestProfit() {
         try {
-            const response = await fetch('/latest-demo-profit/');
+            const response = await fetch('/latest-profit/');
             const data = await response.json();
             return data;
         } catch (error) {

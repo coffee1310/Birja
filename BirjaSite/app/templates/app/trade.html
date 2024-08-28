@@ -2,13 +2,12 @@
 {% load static %}
 
 {% block content %}
-
+<div>
 <select id="cryptoSelect" class="cryptoSelect">
     {% for crypto in cryptos %}
         <option value="{{ crypto.symbol }}">{{ crypto.name }}</option>
     {% endfor %}
 </select>
-
 <div class="menu-container">
     <button id="menu-toggle"><img src="{% static 'app/img/line_chart.png' %}" width="20px"></button>
     <div id="settings-menu" class="hidden">
@@ -61,7 +60,7 @@
 
             <h3>Fill</h3>
             <label class="switch">
-                <input type="checkbox" id="toggle-fill" checked>
+                <input type="checkbox" id="toggle-fill">
                 <span class="slider"></span>
             </label>
 
@@ -83,8 +82,45 @@
 <div id="profitMenu"></div>
 
 <div class="chart-container">
-    <div class="trade-controls">
-        <div class="timer-menu">
+    <div class="trade-controls"> 
+
+
+        <button id="openHistoryBtn" class="open-history-btn">Open Trade History</button>
+
+        <!-- Боковое меню для истории сделок -->
+        <div id="tradeHistoryMenu" class="history-menu">
+            <button id="closeHistoryBtn" class="close-btn">
+                <span class="close-btn-cross"></span>
+            </button>
+            
+            <!-- Форма для фильтрации и сортировки -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="status">Status:</label>
+                    <select id="status" class="filter-select">
+                        <option value="all">All</option>
+                        <option value="closed">Closed</option>
+                        <option value="open">Open</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sort">Sort By:</label>
+                    <select id="sort" class="filter-select">
+                        <option value="time_asc">Time (Asc)</option>
+                        <option value="time_desc">Time (Desc)</option>
+                        <option value="amount_asc">Amount (Asc)</option>
+                        <option value="amount_desc">Amount (Desc)</option>
+                    </select>
+                </div>
+                <button id="applyFilters" class="apply-filters-btn">Apply Filters</button>
+            </div>
+
+            <!-- История сделок -->
+            <div id="betHistory" class="history-list">
+                <!-- История сделок будет загружаться сюда -->
+            </div>
+        </div>
+            <div class="timer-menu">
             <button id="timer-toggle">Select Time</button>
             <div id="timer-settings" class="timer-settings hidden">
                 <div class="timer-settings-2">
@@ -107,14 +143,15 @@
             </div>
             <span id="timer-display">00:00:00</span>
         </div>
-        <div class="amount">
-            <input type="number" id="amount" value="1" min="0.01" step="0.01">
-            <span>Amount</span>
-        </div>
-        <div class="buttons">
-            <button class="higher" onclick="preparePosition('long')" id="longButton"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
-            <button class="lower" onclick="preparePosition('short')" id="shortButton"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
-        </div>
+            <div class="amount">
+                <input type="number" id="amount" value="1" min="0.01" step="0.01">
+                <span>Amount</span>
+            </div>
+            <div class="buttons">
+                <button class="higher" onclick="preparePosition('long')" id="longButton"><img src="{% static 'app/img/profit_up.png' %}"/><strong>LONG</strong></button>
+                <button class="lower" onclick="preparePosition('short')" id="shortButton"><img src="{% static 'app/img/profit_down.png' %}"/><strong>SHORT</strong></button>
+            </div>
+
     </div>
 </div>
 
@@ -126,185 +163,17 @@
     <canvas id="highlightCanvas" style="position:absolute; top:100; left:30px; pointer-events:none;"></canvas>
 </div>
 
-<script type="text/javascript" src="{% static 'app/js/script.js' %}"></script>
+<div id="notification" class="notification hidden">
+    <span id="notification-text"></span>
+</div>
+
+<script type="text/javascript" src="{% static 'app/js/script2.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/js/timer.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/js/settingsToggle.js' %}"></script>
-
 <script type="text/javascript">
 document.addEventListener("DOMContentLoaded", function() {
-    const cryptoSelect = document.getElementById('cryptoSelect');
-    const amountInput = document.getElementById('amount');
-    const timerDisplay = document.getElementById('timer-display');
-    let is_one_pos = true;
-
-    window.preparePosition = function(positionType) {
-        const amount = parseFloat(amountInput.value);
-        checkUserBalance(amount)
-            .then(balanceOk => {
-                if (balanceOk) {
-                    startTimer();
-                    openPosition(positionType, amount);
-                } else {
-                    alert("insufficient funds");
-                }
-            })
-            .catch(error => console.error('Error checking balance:', error));
-    };
-
-    function checkUserBalance(amount) {
-        const csrftoken = getCookie('csrаftoken');
-        return fetch('/check_balance/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify({ amount: amount })
-        })
-        .then(response => response.json())
-        .then(data => data.balance_ok)
-        .catch(error => {
-            console.error('Error checking balance:', error);
-            return false;
-        });
-    }
-
-    function startTimer() {
-        const hours = parseInt(document.getElementById('hours').textContent, 10);
-        const minutes = parseInt(document.getElementById('minutes').textContent, 10);
-        const seconds = parseInt(document.getElementById('seconds').textContent, 10);
-        const totalTime = (hours * 3600) + (minutes * 60) + seconds;
-
-        if (is_one_pos !== true || totalTime < 30) {
-            alert('Position not open');
-            return
-        }
-        is_one_pos = false;
-        alert('Position opened successfully!', hideProfitMenu());
-
-        let timeLeft = totalTime + 1;
-        const timer = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                timerDisplay.textContent = `${document.getElementById('hours').value.padStart(2, '0')}:${document.getElementById('minutes').value.padStart(2, '0')}:${document.getElementById('seconds').value.padStart(2, '0')}`;
-                is_one_pos = true;
-                fetchBalance();
-                updateProfitMenu();
-                return;
-            }
-
-            timeLeft--;
-            const hrs = Math.floor(timeLeft / 3600);
-            const mins = Math.floor((timeLeft % 3600) / 60);
-            const secs = timeLeft % 60;
-
-            timerDisplay.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }, 1000);
-    }
-
-    window.openPosition = function(positionType, amount) {
-        const symbol = cryptoSelect.value;
-        const duration = parseInt(timerDisplay.textContent.split(':').reduce((acc, time) => (60 * acc) + +time));
-
-        const csrftoken = getCookie('csrftoken');
-
-        fetch('/trade/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify({
-                crypto: symbol,
-                amount: amount,
-                duration: duration,
-                position_type: positionType
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            
-            if (data.status === 'success') {
-                console.log('Position opened successfully!');
-            } else {
-                console.log('Error opening position: ' + data.message);
-                alert('Position not open')
-            }
-        })
-        .catch(error => console.error('Error opening position:', error));
-    };
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    function fetchBalance() {
-        const csrftoken = getCookie('csrftoken');
-
-        fetch('/update_balance/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                document.getElementById('balance').textContent = data.new_balance.toString();
-
-            } else {
-                console.error('Error fetching balance:', data.message);
-                console.log(data.new_balance);
-            }
-        })
-        .catch(error => console.error('Error fetching balance:', error));
-    }
-
-    async function fetchLatestProfit() {
-        try {
-            const response = await fetch('/latest-profit/');
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error fetching latest profit:", error);
-        }
-    }
-
-    function showProfitMenu(profit, date) {
-        const profitMenu = document.getElementById('profitMenu');
-        profitMenu.innerHTML = `<strong>Latest Profit:</strong> $${profit} on ${new Date(date).toLocaleString()}`;
-        profitMenu.style.display = 'flex';
-        setTimeout(() => {
-            profitMenu.style.top = '10px';
-        }, 10);
-    }
-
-    async function updateProfitMenu() {
-        const latestProfitData = await fetchLatestProfit();
-        if (latestProfitData) {
-            showProfitMenu(latestProfitData.profit, latestProfitData.date);
-        }
-    }
-
-    function hideProfitMenu() {
-        const profitMenu = document.getElementById('profitMenu');
-        profitMenu.style.top = '-100px';
-        setTimeout(() => {
-            profitMenu.style.display = 'none';
-        }, 500); // Time must match the transition duration in CSS
-    }
+    
 });
 </script>
+<script type="text/javascript"  src="{% static 'app/js/history.js' %}"></script>
 {% endblock %}
